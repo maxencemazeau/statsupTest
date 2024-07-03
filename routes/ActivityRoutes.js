@@ -8,6 +8,8 @@ function activityRoutes (fastify, options, done){
 
     fastify.post('/addActivity', activityController.addActivity)
 
+    fastify.get('/activityWithNoGoal', activityController.ActivityWithoutGoal)
+
     done()
 }
 

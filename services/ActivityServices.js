@@ -14,6 +14,15 @@ const ActivityById = async (id, limit, offset) => {
     }
 };
 
+const ActivityWithoutGoal = async(id) => {
+    try{
+        const query = await db.query(`SELECT ActivityID, ActivityName FROM Activity WHERE UserID = ? AND GoalsID = 0 OR GoalsID IS NULL`,[id])
+        return query[0]
+    } catch(err){
+        return err
+    }
+}
+
 const rowsAfterOffset = async (id) => {
     const query = await db.query(`SELECT Count(ActivityID) as lastAvailableRows FROM Activity WHERE UserID = ?`, [id])
     return query[0]
@@ -28,6 +37,11 @@ const AddNewActivity = async (ActivityName, Timer, GoalsId, UserId) => {
     }
 }
 
-module.exports = { ActivityById, AddNewActivity, rowsAfterOffset }
+const LinkActivityToGoal = async(GoalId, ActivityId) => {
+    const query = await db.query(`UPDATE Activity set GoalsID = ? WHERE ActivityID = ?`,[GoalId, ActivityId])
+    return query[0]
+}
+
+module.exports = { ActivityById, ActivityWithoutGoal, AddNewActivity, rowsAfterOffset, LinkActivityToGoal }
 
 

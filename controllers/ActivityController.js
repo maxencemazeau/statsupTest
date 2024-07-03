@@ -42,4 +42,10 @@ const addActivity = async (req, res) => {
     }
 }
 
-module.exports = { userActivity, addActivity }
+const ActivityWithoutGoal = async(req, res) => {
+    const { id } = req.query
+    const getActivityWithoutGoal = await activityServices.ActivityWithoutGoal(id)
+    res.send(getActivityWithoutGoal)
+}
+
+module.exports = { userActivity, addActivity, ActivityWithoutGoal }

@@ -1,4 +1,5 @@
 const goalServices = require('../services/GoalServices')
+const activityServices = require('../services/ActivityServices')
 
 const userGoal = async (req, res) => {
     let noMoreData = false;
@@ -24,5 +25,24 @@ const userGoal = async (req, res) => {
 
 }
 
+const addGoal = async(req, res) => {
+    const { GoalName, TimeFrame, LinkActivity, Frequence, UserId } = req.body.params
+    let addGoal = 0
 
-module.exports = { userGoal}
+    addGoal = await goalServices.createNewGoal(GoalName, TimeFrame, Frequence, UserId)
+
+    if( LinkActivity.length > 0 ){
+        for(i = 0; i < LinkActivity.length; i++){
+            const linkActivityToGoal = await activityServices.LinkActivityToGoal(addGoal, LinkActivity[i])
+        }
+    }
+    if(addGoal > 0 ){
+        res.send("Goal successfully created")
+    } else {
+        res.send("Error while adding the new activity")
+    }
+
+}
+
+
+module.exports = { userGoal, addGoal}
