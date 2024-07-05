@@ -1,16 +1,15 @@
-const activityController = require('../controllers/ActivityController')
+const activityController = require("../controllers/ActivityController");
 
+function activityRoutes(fastify, options, done) {
+  fastify.get("/userActivity", activityController.userActivity);
 
+  fastify.post("/addActivity", activityController.addActivity);
 
-function activityRoutes (fastify, options, done){
+  fastify.get("/activityWithNoGoal", activityController.ActivityWithoutGoal);
 
-    fastify.get('/userActivity', activityController.userActivity)
+  fastify.get("/CheckDuplicate", activityController.CheckDuplicate);
 
-    fastify.post('/addActivity', activityController.addActivity)
-
-    fastify.get('/activityWithNoGoal', activityController.ActivityWithoutGoal)
-
-    done()
+  done();
 }
 
-module.exports = activityRoutes
+module.exports = activityRoutes;

@@ -37,9 +37,9 @@ const addGoal = async(req, res) => {
         }
     }
     if(addGoal > 0 ){
-        res.send("Goal successfully created")
+        res.send(1)
     } else {
-        res.send("Error while adding the new activity")
+        res.send(0)
     }
 
 }
