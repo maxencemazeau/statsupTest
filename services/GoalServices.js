@@ -6,7 +6,7 @@ const userGoal = async (id, limitValue, offsetValue) => {
         const query = await db.query(`SELECT GoalsID, GoalName, Frequence, Frame, Goals.UserID
     FROM Goals
     LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
-    WHERE UserID = ? LIMIT ? OFFSET ?`, [id, limitValue, offsetValue])
+    WHERE UserID = ? ORDER BY GoalsID DESC LIMIT ? OFFSET ?`, [id, limitValue, offsetValue])
         return query[0]
     } catch (err) {
         console.log(err)
@@ -18,11 +18,19 @@ const rowsAfterOffset = async (id) => {
     return query[0]
 }
 
-const createNewGoal = async(GoalName, TimeFrame, Frequence, UserId) => {
+const createNewGoal = async (GoalName, TimeFrame, Frequence, UserId) => {
     const query = await db.query(`INSERT INTO Goals (GoalName, TimeFrameID, Frequence, UserID) values (?,?,?,?)`, [GoalName, TimeFrame, Frequence, UserId])
-    if (query[0].affectedRows > 0){
+    if (query[0].affectedRows > 0) {
         return query[0].insertId
     }
 }
 
-module.exports = { userGoal, rowsAfterOffset, createNewGoal }
+const CheckNameDuplicate = async (UserId, GoalName) => {
+    const query = await db.query(
+        `SELECT GoalName FROM Goals WHERE UserID = ? AND GoalName = ?`,
+        [UserId, GoalName]
+    );
+    return query[0];
+};
+
+module.exports = { userGoal, rowsAfterOffset, createNewGoal, CheckNameDuplicate }

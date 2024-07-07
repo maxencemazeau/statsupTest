@@ -7,7 +7,7 @@ function activityRoutes(fastify, options, done) {
 
   fastify.get("/activityWithNoGoal", activityController.ActivityWithoutGoal);
 
-  fastify.get("/CheckDuplicate", activityController.CheckDuplicate);
+  fastify.get("/CheckActivityDuplicate", activityController.CheckDuplicate);
 
   done();
 }

@@ -3,7 +3,7 @@ const goalServices = require("../services/GoalServices");
 
 const userActivity = async (req, res) => {
   let noMoreData = false;
-  let limit = 5;
+  let limit = 6;
   let activity = [];
   const { id, offset } = req.query;
   const availableRows = await activityServices.rowsAfterOffset(id);

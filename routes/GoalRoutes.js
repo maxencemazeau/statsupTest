@@ -5,6 +5,7 @@ function goalRoutes (fastify, options, done){
 
     fastify.get('/userGoal', goalController.userGoal)
     fastify.post('/addGoal', goalController.addGoal)
+    fastify.get("/CheckGoalDuplicate", goalController.CheckDuplicate);
 
     done()
 }
