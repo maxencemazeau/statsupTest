@@ -10,7 +10,6 @@ const ActivityById = async (id, limit, offset) => {
     WHERE Activity.UserID = ? ORDER BY ActivityID DESC LIMIT ? OFFSET ?`,
       [id, limit, offset]
     );
-    console.log(query[0])
     return query[0];
   } catch (err) {
     console.log(err);
