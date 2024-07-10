@@ -9,6 +9,12 @@ function activityRoutes(fastify, options, done) {
 
   fastify.get("/CheckActivityDuplicate", activityController.CheckDuplicate);
 
+  try {
+    fastify.delete("/deleteActivity", activityController.DeleteActivity)
+  } catch (err) {
+    console.log(err)
+  }
+
   done();
 }
 

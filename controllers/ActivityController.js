@@ -85,9 +85,22 @@ const CheckDuplicate = async (req, res) => {
   }
 };
 
+const DeleteActivity = async (req, res) => {
+  const ActivityID = req.query.id;
+  const hasBeenDeleted = await activityServices.DeleteActivity(ActivityID)
+
+  if (hasBeenDeleted > 0) {
+    res.send("SUCCESS")
+  } else {
+    res.send("ERROR")
+  }
+
+}
+
 module.exports = {
   userActivity,
   addActivity,
   ActivityWithoutGoal,
   CheckDuplicate,
+  DeleteActivity
 };

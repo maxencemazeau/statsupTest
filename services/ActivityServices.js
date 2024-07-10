@@ -64,6 +64,11 @@ const CheckNameDuplicate = async (UserId, ActivityName) => {
   return query[0];
 };
 
+const DeleteActivity = async (ActivityId) => {
+  const query = await db.query(`DELETE FROM Activity WHERE ActivityID = ?`, [ActivityId])
+  return query[0].affectedRows;
+}
+
 module.exports = {
   ActivityById,
   ActivityWithoutGoal,
@@ -71,4 +76,5 @@ module.exports = {
   rowsAfterOffset,
   LinkActivityToGoal,
   CheckNameDuplicate,
+  DeleteActivity
 };
