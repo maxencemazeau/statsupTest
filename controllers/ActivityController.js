@@ -1,5 +1,7 @@
 const activityServices = require("../services/ActivityServices");
 const goalServices = require("../services/GoalServices");
+const { FormattedDate } = require("../utils/FormattedDate");
+const { getWeek } = require("../utils/getWeek");
 
 const userActivity = async (req, res) => {
   let noMoreData = false;
@@ -20,43 +22,50 @@ const userActivity = async (req, res) => {
     noMoreData = true;
   }
 
+  if (activity.length > 0) {
+    let TodayDate = FormattedDate('day')
+    for (i = 0; i < activity.length; i++) {
+      if (activity[i].TimeStamp !== null) {
+        let activityDate = new Date(activity[i].TimeStamp)
+        let activityMonth = activityDate.getMonth() + 1
+        let thisWeek = FormattedDate('week')
+        switch (activity[i].TimeFrameID) {
+          case 1: //Monthly
+            if (activityMonth !== TodayDate.getMonth() + 1) {
+              activity[i].Count = 0
+            }
+            break;
+          case 2: //Weekly
+            if (getWeek(activityDate) !== thisWeek) {
+              activity[i].Count = 0
+            }
+            break;
+          case 3: //Daily
+            if (activityDate.getDay() + 1 !== TodayDate.getDay() + 1) {
+              activity[i].Count = 0
+            }
+            break;
+        }
+      }
+    }
+  }
+
   res.send({ activity, noMoreData });
 };
 
 const addActivity = async (req, res) => {
   let addActivity = false;
   let newGoalId = 0;
-  const {
-    ActivityName,
-    Timer,
-    GoalsId,
-    CreateNewGoal,
-    GoalName,
-    TimeFrame,
-    Frequence,
-    UserId,
-  } = req.body.params;
+  const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId, } = req.body.params;
 
   if (CreateNewGoal !== true) {
-    addActivity = await activityServices.AddNewActivity(
-      ActivityName,
-      Timer,
-      GoalsId,
-      UserId
-    );
+    if (GoalsId == 0) {
+      GoalsId = null
+    }
+    addActivity = await activityServices.AddNewActivity(ActivityName, GoalsId, UserId);
   } else {
-    newGoalId = await goalServices.createNewGoal(
-      GoalName,
-      TimeFrame,
-      Frequence,
-      UserId
-    );
-    addActivity = await activityServices.AddNewActivity(
-      ActivityName,
-      Timer,
-      newGoalId,
-      UserId
-    );
+    newGoalId = await goalServices.createNewGoal(GoalName, TimeFrame, Frequence, UserId);
+    addActivity = await activityServices.AddNewActivity(ActivityName, newGoalId, UserId);
   }
 
   if (addActivity) {
@@ -96,6 +105,10 @@ const DeleteActivity = async (req, res) => {
   }
 
 }
+
+// const UpdateCompletedActivity = async(req, res) => {
+//   const { UserId, ActivityId } = req,query
+// }
 
 module.exports = {
   userActivity,

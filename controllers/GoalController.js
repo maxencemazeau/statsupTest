@@ -12,7 +12,6 @@ const userGoal = async (req, res) => {
         limit = lastAvailableRow
         noMoreData = true
     }
-
     if (lastAvailableRow > 0) {
         const offsetValue = parseInt(offset);
         const limitValue = parseInt(limit)
@@ -30,7 +29,6 @@ const addGoal = async (req, res) => {
     let addGoal = 0
 
     addGoal = await goalServices.createNewGoal(GoalName, TimeFrame, Frequence, UserId)
-
     if (LinkActivity.length > 0) {
         for (i = 0; i < LinkActivity.length; i++) {
             const linkActivityToGoal = await activityServices.LinkActivityToGoal(addGoal, LinkActivity[i])
@@ -54,5 +52,21 @@ const CheckDuplicate = async (req, res) => {
     }
 };
 
+const DeleteGoal = async (req, res) => {
+    const GoalID = req.query.id;
+    const hasBeenDeleted = await goalServices.DeleteGoal(GoalID)
 
-module.exports = { userGoal, addGoal, CheckDuplicate }
+    if (hasBeenDeleted > 0) {
+        res.send("SUCCESS")
+    } else {
+        res.send("ERROR")
+    }
+}
+
+const GetAllUserGoal = async (req, res) => {
+    const UserId = req.query.id
+    const goalList = await goalServices.GetAllUserGoal(UserId)
+    res.send(goalList)
+}
+
+module.exports = { userGoal, addGoal, CheckDuplicate, DeleteGoal, GetAllUserGoal }

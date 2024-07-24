@@ -3,11 +3,40 @@ const db = require("../db");
 const ActivityById = async (id, limit, offset) => {
   try {
     const query = await db.query(
-      `SELECT ActivityID, ActivityName, Frequence, Frame, Activity.UserID, Timer, Goals.GoalName 
+      //   `SELECT ActivityID, ActivityName, Frequence, Frame, Activity.UserID, Timer, Goals.GoalName
+      // FROM Activity
+      // LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
+      // LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
+      // LEFT JOIN (
+      //   SELECT MAX(ActivityHistoryID) as ActivityHistoryID, TimeStamp
+      //   FROM ActivityHistory 
+      // )
+      // WHERE Activity.UserID = ? ORDER BY ActivityID DESC LIMIT ? OFFSET ?`,
+      `SELECT 
+    Activity.ActivityID, 
+    Activity.ActivityName, 
+    Goals.Frequence,
+    Goals.TimeFrameID, 
+    TimeFrame.Frame, 
+    Activity.UserID, 
+    Activity.Timer, 
+    Goals.GoalName, 
+    DATE_FORMAT(ActivityHistory.TimeStamp, '%Y-%m-%d') as TimeStamp,
+    ActivityHistory.ActivityHistoryID,
+    ActivityHistory.Count
     FROM Activity
     LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
     LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
-    WHERE Activity.UserID = ? ORDER BY ActivityID DESC LIMIT ? OFFSET ?`,
+    LEFT JOIN (
+        SELECT ActivityID, MAX(ActivityHistoryID) as MaxActivityHistoryID
+        FROM ActivityHistory
+        GROUP BY ActivityID
+      ) max_ah ON Activity.ActivityID = max_ah.ActivityID
+      LEFT JOIN ActivityHistory ON max_ah.MaxActivityHistoryID = ActivityHistory.ActivityHistoryID
+      WHERE Activity.UserID = ?
+      ORDER BY Activity.ActivityID DESC
+      LIMIT ? OFFSET ?;`
+      ,
       [id, limit, offset]
     );
     return query[0];
@@ -23,6 +52,7 @@ const ActivityWithoutGoal = async (id) => {
       [id]
     );
     return query[0];
+    console.log(query[0])
   } catch (err) {
     return err;
   }
@@ -36,11 +66,11 @@ const rowsAfterOffset = async (id) => {
   return query[0];
 };
 
-const AddNewActivity = async (ActivityName, Timer, GoalsId, UserId) => {
+const AddNewActivity = async (ActivityName, GoalsId, UserId) => {
   try {
     const query = await db.query(
-      `INSERT INTO Activity (ActivityName, Timer, GoalsID, UserID) values (?,?,?,?)`,
-      [ActivityName, Timer, GoalsId, UserId]
+      `INSERT INTO Activity (ActivityName, GoalsID, UserID) values (?,?,?)`,
+      [ActivityName, GoalsId, UserId]
     );
     return query[0].insertId;
   } catch (err) {

@@ -33,4 +33,18 @@ const CheckNameDuplicate = async (UserId, GoalName) => {
     return query[0];
 };
 
-module.exports = { userGoal, rowsAfterOffset, createNewGoal, CheckNameDuplicate }
+const DeleteGoal = async (GoalId) => {
+    const query = await db.query(`DELETE FROM Goals WHERE GoalsID = ?`, [GoalId])
+    return query[0].affectedRows;
+}
+
+const GetAllUserGoal = async (UserId) => {
+    try {
+        const query = await db.query(`SELECT GoalsID, GoalName FROM Goals WHERE UserID = ?`, [UserId])
+        return query[0]
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports = { userGoal, rowsAfterOffset, createNewGoal, CheckNameDuplicate, DeleteGoal, GetAllUserGoal }
