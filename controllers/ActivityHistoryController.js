@@ -9,19 +9,20 @@ const addActivityHistory = async (req, res) => {
     const today = FormattedDate('fullDate')
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
     console.log(hasTodayHistory)
+    console.log(Count)
     if (hasTodayHistory === 0) {
-        addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count)
+        addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0)
     } else {
         const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
         if (lastHistoryFormattedDate !== today) {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count)
+            if (Count >= hasTodayHistory.Frequence) {
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1)
+            } else {
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0)
+            }
         }
     }
-    // const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
 
-    // if (lastHistoryFormattedDate !== today) {
-    //     addActivityHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count)
-    // }
 
     if (addHistory === 1) {
         console.log("Add Success")
@@ -37,16 +38,14 @@ const DeleteActivityHistory = async (req, res) => {
 
     let deleteHistory = 0
     const checkLastHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
-
-    const lastHistoryFormattedDate = historyFormattedDate(checkLastHistory.TimeStamp)
-    if (lastHistoryFormattedDate === today) {
-        deleteHistory = await activityHistortyServices.DeleteActivityHistory(checkLastHistory.ActivityHistoryID)
+    if (checkLastHistory === 0) {
+        console.log("Nothing to delete")
+    } else {
+        const lastHistoryFormattedDate = historyFormattedDate(checkLastHistory.TimeStamp)
+        if (lastHistoryFormattedDate === today) {
+            deleteHistory = await activityHistortyServices.DeleteActivityHistory(checkLastHistory.ActivityHistoryID)
+        }
     }
-    //console.log(lastHistoryFormattedDate + " " + today)
-    // if (checkLastHistory[0] === 1) {
-    //     const IdChecked = checkLastHistory[1]
-    //     deleteHistory = await activityHistortyServices.DeleteActivityHistory(IdChecked)
-    // }
 
 
     if (deleteHistory === 1) {

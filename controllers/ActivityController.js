@@ -106,6 +106,12 @@ const DeleteActivity = async (req, res) => {
 
 }
 
+const GetUserActivityByID = async (req, res) => {
+  const { ActivityID } = req.query
+  const activity = await activityServices.GetUserActivityByID(ActivityID)
+  res.send(activity)
+}
+
 // const UpdateCompletedActivity = async(req, res) => {
 //   const { UserId, ActivityId } = req,query
 // }
@@ -115,5 +121,6 @@ module.exports = {
   addActivity,
   ActivityWithoutGoal,
   CheckDuplicate,
-  DeleteActivity
+  DeleteActivity,
+  GetUserActivityByID
 };

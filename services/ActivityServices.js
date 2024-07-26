@@ -99,6 +99,20 @@ const DeleteActivity = async (ActivityId) => {
   return query[0].affectedRows;
 }
 
+const GetUserActivityByID = async (ActivityId) => {
+  try {
+    const query = await db.query(`SELECT ActivityID, ActivityName, Frequence, Frame, Activity.UserID, 
+      Goals.GoalsID, Goals.GoalName, TimeFrame.TimeFrameID
+      FROM Activity
+      LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
+      LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
+      WHERE Activity.ActivityID = ?`, [ActivityId])
+    return query[0]
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 module.exports = {
   ActivityById,
   ActivityWithoutGoal,
@@ -106,5 +120,6 @@ module.exports = {
   rowsAfterOffset,
   LinkActivityToGoal,
   CheckNameDuplicate,
-  DeleteActivity
+  DeleteActivity,
+  GetUserActivityByID
 };

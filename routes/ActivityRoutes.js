@@ -6,6 +6,7 @@ function activityRoutes(fastify, options, done) {
   fastify.get("/activityWithNoGoal", activityController.ActivityWithoutGoal);
   fastify.get("/CheckActivityDuplicate", activityController.CheckDuplicate);
   fastify.delete("/deleteActivity", activityController.DeleteActivity)
+  fastify.get("/getUserActivityByID", activityController.GetUserActivityByID)
   //fastify.put("/updateCompletedActivity", activityController.UpdateCompletedActivity)
 
   done();
