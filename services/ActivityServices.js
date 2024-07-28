@@ -113,6 +113,22 @@ const GetUserActivityByID = async (ActivityId) => {
   }
 }
 
+const UpdateActivity = async (ActivityId, ActivityName, GoalsId) => {
+  try {
+    const query = await db.query(`UPDATE Activity set ActivityName = ?, GoalsID = ? WHERE ActivityID = ?`, [ActivityName, GoalsId, ActivityId,])
+
+    if (query[0].affectedRows > 0) {
+      return 1
+    } else {
+      return 0
+    }
+  } catch (err) {
+    console.log(err)
+  }
+
+
+}
+
 module.exports = {
   ActivityById,
   ActivityWithoutGoal,
@@ -121,5 +137,6 @@ module.exports = {
   LinkActivityToGoal,
   CheckNameDuplicate,
   DeleteActivity,
-  GetUserActivityByID
+  GetUserActivityByID,
+  UpdateActivity
 };

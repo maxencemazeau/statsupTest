@@ -69,4 +69,15 @@ const GetAllUserGoal = async (req, res) => {
     res.send(goalList)
 }
 
-module.exports = { userGoal, addGoal, CheckDuplicate, DeleteGoal, GetAllUserGoal }
+const UpdateGoal = async (req, res) => {
+    const { GoalsId, GoalName, TimeFrameID, Frequence } = req.body.params
+    console.log(req.body.params)
+    const hasGoalbeenUpdated = await goalServices.UpdateGoal(GoalName, TimeFrameID, Frequence, GoalsId)
+    if (hasGoalbeenUpdated === 1) {
+        console.log('Success')
+    } else {
+        console.log('Error')
+    }
+}
+
+module.exports = { userGoal, addGoal, CheckDuplicate, DeleteGoal, GetAllUserGoal, UpdateGoal }

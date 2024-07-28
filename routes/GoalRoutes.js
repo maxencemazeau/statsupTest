@@ -8,6 +8,7 @@ function goalRoutes(fastify, options, done) {
     fastify.get("/CheckGoalDuplicate", goalController.CheckDuplicate);
     fastify.delete("/deleteGoal", goalController.DeleteGoal)
     fastify.get("/getAllUserGoal", goalController.GetAllUserGoal)
+    fastify.put("/updateGoal", goalController.UpdateGoal)
     done()
 }
 

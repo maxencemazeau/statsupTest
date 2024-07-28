@@ -1,5 +1,6 @@
 const activityServices = require("../services/ActivityServices");
 const goalServices = require("../services/GoalServices");
+const goalController = require("../controllers/GoalController")
 const { FormattedDate } = require("../utils/FormattedDate");
 const { getWeek } = require("../utils/getWeek");
 
@@ -56,7 +57,7 @@ const userActivity = async (req, res) => {
 const addActivity = async (req, res) => {
   let addActivity = false;
   let newGoalId = 0;
-  const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId, } = req.body.params;
+  const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId } = req.body.params;
 
   if (CreateNewGoal !== true) {
     if (GoalsId == 0) {
@@ -112,9 +113,15 @@ const GetUserActivityByID = async (req, res) => {
   res.send(activity)
 }
 
-// const UpdateCompletedActivity = async(req, res) => {
-//   const { UserId, ActivityId } = req,query
-// }
+const UpdateActivity = async (req, res) => {
+  const { ActivityID, ActivityName, GoalsId, UserId } = req.body.params
+  const hasActivitybeenUpdated = await activityServices.UpdateActivity(ActivityID, ActivityName, GoalsId)
+  if (hasActivitybeenUpdated === 1) {
+    console.log('Success')
+  } else {
+    console.log('Error')
+  }
+}
 
 module.exports = {
   userActivity,
@@ -122,5 +129,6 @@ module.exports = {
   ActivityWithoutGoal,
   CheckDuplicate,
   DeleteActivity,
-  GetUserActivityByID
+  GetUserActivityByID,
+  UpdateActivity
 };
