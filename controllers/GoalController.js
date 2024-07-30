@@ -71,12 +71,12 @@ const GetAllUserGoal = async (req, res) => {
 
 const UpdateGoal = async (req, res) => {
     const { GoalsId, GoalName, TimeFrameID, Frequence } = req.body.params
-    console.log(req.body.params)
+
     const hasGoalbeenUpdated = await goalServices.UpdateGoal(GoalName, TimeFrameID, Frequence, GoalsId)
     if (hasGoalbeenUpdated === 1) {
-        console.log('Success')
+        res.send(1)
     } else {
-        console.log('Error')
+        res.send(0)
     }
 }
 

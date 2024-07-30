@@ -4,21 +4,23 @@ const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
 
 const addActivityHistory = async (req, res) => {
-    const { ActivityHistoryID, ActivityID, TimeStamp, Count } = req.body.params
+    const { ActivityHistoryID, ActivityID, TimeStamp, Count, Frequence, UserID } = req.body.params
     let addHistory = 0
     const today = FormattedDate('fullDate')
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
-    console.log(hasTodayHistory)
-    console.log(Count)
     if (hasTodayHistory === 0) {
-        addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0)
+        if (Frequence === Count) {
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID)
+        } else {
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID)
+        }
     } else {
         const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
         if (lastHistoryFormattedDate !== today) {
             if (Count >= hasTodayHistory.Frequence) {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID)
             } else {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID)
             }
         }
     }
@@ -56,7 +58,19 @@ const DeleteActivityHistory = async (req, res) => {
     res.send("Success")
 }
 
+const GetTotalActivityCount = async (req, res) => {
+    const UserID = req.query.id
+    const total = await activityHistortyServices.GetTotalActivityCount(UserID)
+    res.send(total)
+}
+
+const UpdateNonSucceedActivity = (ActivityHistoryID) => {
+    activityHistortyServices.UpdateNonSucceedActivity(ActivityHistoryID)
+}
+
 module.exports = {
     addActivityHistory,
-    DeleteActivityHistory
+    DeleteActivityHistory,
+    UpdateNonSucceedActivity,
+    GetTotalActivityCount
 };

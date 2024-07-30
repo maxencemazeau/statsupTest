@@ -1,6 +1,7 @@
 const activityServices = require("../services/ActivityServices");
 const goalServices = require("../services/GoalServices");
-const goalController = require("../controllers/GoalController")
+const activityHistortyServices = require("../services/ActivityHistoryServices")
+const activityHistoryController = require("../controllers/ActivityHistoryController")
 const { FormattedDate } = require("../utils/FormattedDate");
 const { getWeek } = require("../utils/getWeek");
 
@@ -34,16 +35,19 @@ const userActivity = async (req, res) => {
           case 1: //Monthly
             if (activityMonth !== TodayDate.getMonth() + 1) {
               activity[i].Count = 0
+              activityHistoryController.UpdateNonSucceedActivity(activity[i].ActivityHistoryID)
             }
             break;
           case 2: //Weekly
             if (getWeek(activityDate) !== thisWeek) {
               activity[i].Count = 0
+              activityHistoryController.UpdateNonSucceedActivity(activity[i].ActivityHistoryID)
             }
             break;
           case 3: //Daily
             if (activityDate.getDay() + 1 !== TodayDate.getDay() + 1) {
               activity[i].Count = 0
+              activityHistoryController.UpdateNonSucceedActivity(activity[i].ActivityHistoryID)
             }
             break;
         }
@@ -57,8 +61,9 @@ const userActivity = async (req, res) => {
 const addActivity = async (req, res) => {
   let addActivity = false;
   let newGoalId = 0;
+  console.log("ici")
   const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId } = req.body.params;
-
+  console.log(req.body.params)
   if (CreateNewGoal !== true) {
     if (GoalsId == 0) {
       GoalsId = null
@@ -109,17 +114,32 @@ const DeleteActivity = async (req, res) => {
 
 const GetUserActivityByID = async (req, res) => {
   const { ActivityID } = req.query
+  let activityStats = []
   const activity = await activityServices.GetUserActivityByID(ActivityID)
-  res.send(activity)
+  switch (activity[0].TimeFrameID) {
+    case 1:
+      frame = "MONTH"
+      activityStats = await activityHistortyServices.ActivityStatsByMonth(ActivityID)
+      break;
+    case 2:
+      frame = "WEEK"
+      activityStats = await activityHistortyServices.ActivityStatsByWeek(ActivityID)
+      break;
+    case 3:
+      frame = "DAY"
+      activityStats = await activityHistortyServices.ActivityStatsByDay(ActivityID)
+      break;
+  }
+  res.send({ activity, activityStats })
 }
 
 const UpdateActivity = async (req, res) => {
   const { ActivityID, ActivityName, GoalsId, UserId } = req.body.params
   const hasActivitybeenUpdated = await activityServices.UpdateActivity(ActivityID, ActivityName, GoalsId)
   if (hasActivitybeenUpdated === 1) {
-    console.log('Success')
+    res.send(1)
   } else {
-    console.log('Error')
+    res.send(0)
   }
 }
 

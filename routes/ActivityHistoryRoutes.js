@@ -2,7 +2,8 @@ const activityHistoryController = require("../controllers/ActivityHistoryControl
 
 function ActivityHistoryRoutes(fastify, options, done) {
     fastify.post("/addActivityHistory", activityHistoryController.addActivityHistory);
-    fastify.delete("/deleteActivityHistory", activityHistoryController.DeleteActivityHistory)
+    fastify.delete("/deleteActivityHistory", activityHistoryController.DeleteActivityHistory);
+    fastify.get("/getTotalActivityCompleted", activityHistoryController.GetTotalActivityCount)
     //fastify.put("/updateCompletedActivity", activityController.UpdateCompletedActivity)
 
     done();

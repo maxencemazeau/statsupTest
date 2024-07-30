@@ -102,7 +102,7 @@ const DeleteActivity = async (ActivityId) => {
 const GetUserActivityByID = async (ActivityId) => {
   try {
     const query = await db.query(`SELECT ActivityID, ActivityName, Frequence, Frame, Activity.UserID, 
-      Goals.GoalsID, Goals.GoalName, TimeFrame.TimeFrameID
+      Goals.GoalsID, Goals.GoalName, TimeFrame.TimeFrameID, TimeFrame.Frame
       FROM Activity
       LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
       LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID

@@ -1,8 +1,8 @@
 const db = require("../db");
 const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
-const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed) => {
-    const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed) values (?,?,?,?)`, [ActivityID, TimeStamp, Count, Succeed])
+const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID) => {
+    const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID) values (?,?,?,?,?)`, [ActivityID, TimeStamp, Count, Succeed, UserID])
     return query[0].affectedRows
 }
 
@@ -29,4 +29,93 @@ const CheckDuplicateHistory = async (ActivityID, TimeStamp, today) => {
     }
 }
 
-module.exports = { AddActivityHistory, DeleteActivityHistory, CheckDuplicateHistory }
+const CountActivityById = async (ActivityId) => {
+    const query = await db.query(`SELECT COUNT(ActivityId) as activityCompleted FROM ActivityHistory WHERE ActivityID = ?`, [ActivityId])
+    return query[0]
+}
+
+const ActivityStatsByWeek = async (ActivityId) => {
+    try {
+        const [query] = await db.query(`SELECT 
+            COUNT(ActivityID) AS totalActivityCompleted,
+            COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            MIN(TimeStamp) AS date_premier,
+            MAX(TimeStamp) AS date_dernier,
+            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), MAX(TimeStamp)) AS totalGoalNumber
+            FROM 
+            ActivityHistory
+            WHERE 
+            ActivityID = ?;
+    `, [ActivityId])
+        return query[0]
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+const ActivityStatsByDay = async (ActivityId) => {
+    try {
+        const [query] = await db.query(`SELECT 
+            COUNT(ActivityID) AS totalActivityCompleted,
+            COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            MIN(TimeStamp) AS date_premier,
+            MAX(TimeStamp) AS date_dernier,
+            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), MAX(TimeStamp)) AS totalGoalNumber
+            FROM 
+            ActivityHistory
+            WHERE 
+            ActivityID = ?;
+    `, [ActivityId])
+        return query[0]
+    } catch (err) {
+        console.log(err)
+    }
+
+}
+
+const ActivityStatsByMonth = async (ActivityId) => {
+    try {
+        const [query] = await db.query(`SELECT 
+            COUNT(ActivityID) AS totalActivityCompleted,
+            COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            MIN(TimeStamp) AS date_premier,
+            MAX(TimeStamp) AS date_dernier,
+            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), MAX(TimeStamp)) AS totalGoalNumber
+            FROM 
+            ActivityHistory
+            WHERE 
+            ActivityID = ?;
+    `, [ActivityId])
+        return query[0]
+    } catch (err) {
+        console.log(err)
+    }
+
+}
+
+const GetTotalActivityCount = async (UserId) => {
+    const [query] = await db.query(`SELECT COUNT(ActivityHistoryId) as TotalActivityCompleted FROM ActivityHistory WHERE UserID = ?`, [UserId])
+    return query[0]
+}
+
+const UpdateNonSucceedActivity = (ActivityHistoryID) => {
+    try {
+        const query = db.query(`UPDATE ActivityHistory set Succeed = -1 WHERE ActivityHistoryID = ?`, [ActivityHistoryID])
+        return (query[0])
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+module.exports = {
+    AddActivityHistory,
+    DeleteActivityHistory,
+    CheckDuplicateHistory,
+    CountActivityById,
+    UpdateNonSucceedActivity,
+    GetTotalActivityCount,
+    ActivityStatsByWeek,
+    ActivityStatsByMonth,
+    ActivityStatsByDay
+}
