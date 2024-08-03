@@ -68,9 +68,28 @@ const UpdateNonSucceedActivity = (ActivityHistoryID) => {
     activityHistortyServices.UpdateNonSucceedActivity(ActivityHistoryID)
 }
 
+const GetBestActivityStreak = async (ActivityID, UserID) => {
+    const history = await activityHistortyServices.GetBestActivityStreak(ActivityID, UserID)
+    let StreakCounter = 0
+    let StreakCounterBackUp = 0
+
+    for (i = 0; i < history.length; i++) {
+        if (history[i].Succeed === 1) {
+            StreakCounter++
+            if (StreakCounter > StreakCounterBackUp) {
+                StreakCounterBackUp = StreakCounter
+            }
+        } else {
+            StreakCounter = 0
+        }
+    }
+    return StreakCounterBackUp
+}
+
 module.exports = {
     addActivityHistory,
     DeleteActivityHistory,
     UpdateNonSucceedActivity,
-    GetTotalActivityCount
+    GetTotalActivityCount,
+    GetBestActivityStreak
 };

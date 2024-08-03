@@ -113,7 +113,7 @@ const DeleteActivity = async (req, res) => {
 }
 
 const GetUserActivityByID = async (req, res) => {
-  const { ActivityID } = req.query
+  const { ActivityID, UserID } = req.query
   let activityStats = []
   const activity = await activityServices.GetUserActivityByID(ActivityID)
   switch (activity[0].TimeFrameID) {
@@ -130,7 +130,14 @@ const GetUserActivityByID = async (req, res) => {
       activityStats = await activityHistortyServices.ActivityStatsByDay(ActivityID)
       break;
   }
-  res.send({ activity, activityStats })
+
+  if (activityStats.totalGoalNumber == null) {
+    activityStats.totalGoalNumber = 0
+  }
+
+  const bestStreak = await activityHistoryController.GetBestActivityStreak(ActivityID, UserID)
+
+  res.send({ activity, activityStats, bestStreak })
 }
 
 const UpdateActivity = async (req, res) => {

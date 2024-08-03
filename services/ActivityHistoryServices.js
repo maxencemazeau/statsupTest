@@ -40,8 +40,8 @@ const ActivityStatsByWeek = async (ActivityId) => {
             COUNT(ActivityID) AS totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             MIN(TimeStamp) AS date_premier,
-            MAX(TimeStamp) AS date_dernier,
-            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), MAX(TimeStamp)) AS totalGoalNumber
+            CURRENT_DATE() AS date_dernier,
+            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
             FROM 
             ActivityHistory
             WHERE 
@@ -59,8 +59,8 @@ const ActivityStatsByDay = async (ActivityId) => {
             COUNT(ActivityID) AS totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             MIN(TimeStamp) AS date_premier,
-            MAX(TimeStamp) AS date_dernier,
-            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), MAX(TimeStamp)) AS totalGoalNumber
+            CURRENT_DATE() AS date_dernier,
+            TIMESTAMPDIFF(DAY, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
             FROM 
             ActivityHistory
             WHERE 
@@ -79,8 +79,8 @@ const ActivityStatsByMonth = async (ActivityId) => {
             COUNT(ActivityID) AS totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             MIN(TimeStamp) AS date_premier,
-            MAX(TimeStamp) AS date_dernier,
-            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), MAX(TimeStamp)) AS totalGoalNumber
+            CURRENT_DATE() AS date_dernier,
+            TIMESTAMPDIFF(MONTH, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
             FROM 
             ActivityHistory
             WHERE 
@@ -107,6 +107,15 @@ const UpdateNonSucceedActivity = (ActivityHistoryID) => {
     }
 }
 
+const GetBestActivityStreak = async (ActivityID, UserID) => {
+    try {
+        const [query] = await db.query(`SELECT Succeed FROM ActivityHistory WHERE ActivityId = ? AND UserID = ? AND (Succeed = 1 OR Succeed = -1)`, [ActivityID, UserID])
+        return [query][0]
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 
 module.exports = {
     AddActivityHistory,
@@ -117,5 +126,6 @@ module.exports = {
     GetTotalActivityCount,
     ActivityStatsByWeek,
     ActivityStatsByMonth,
-    ActivityStatsByDay
+    ActivityStatsByDay,
+    GetBestActivityStreak
 }
