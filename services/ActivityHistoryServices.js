@@ -116,19 +116,28 @@ const GetBestActivityStreak = async (ActivityID, UserID) => {
     }
 }
 
-const GetActivityHistory = async (ActivityID) => {
+const GetActivityHistory = async (ActivityID, Limit, Offset) => {
     try {
         const [query] = await db.query(`SELECT ActivityHistoryID, Succeed, DATE_FORMAT(TimeStamp, '%Y-%m-%d') as TimeStamp, Count, ActivityHistory.ActivityID, Frequence 
             FROM ActivityHistory 
             INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
             INNER JOIN Goals ON Goals.GoalsID = Activity.GoalsID
             WHERE ActivityHistory.ActivityID = ?
-            ORDER BY ActivityHistoryID DESC`, [ActivityID])
+            ORDER BY ActivityHistoryID DESC
+            LIMIT ? OFFSET ?`, [ActivityID, Limit, Offset])
         return [query][0]
     } catch (err) {
         console.log(err)
     }
 }
+
+const rowsAfterOffset = async (ActivityID) => {
+    const query = await db.query(
+        `SELECT Count(ActivityID) as lastAvailableRows FROM ActivityHistory WHERE ActivityID = ?`,
+        [ActivityID]
+    );
+    return query[0];
+};
 
 
 module.exports = {
@@ -142,5 +151,6 @@ module.exports = {
     ActivityStatsByMonth,
     ActivityStatsByDay,
     GetBestActivityStreak,
-    GetActivityHistory
+    GetActivityHistory,
+    rowsAfterOffset
 }

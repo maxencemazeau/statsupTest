@@ -87,9 +87,28 @@ const GetBestActivityStreak = async (ActivityID, UserID) => {
 }
 
 const GetActivityHistory = async (req, res) => {
-    const { ActivityID } = req.query
-    const activityHistory = await activityHistortyServices.GetActivityHistory(ActivityID)
-    res.send(activityHistory)
+    const { ActivityID, Offset } = req.query
+    let limit = 5;
+    let activityHistory = []
+    let noMoreData = false
+    const availableRows = await activityHistortyServices.rowsAfterOffset(ActivityID);
+    const lastAvailableRow = availableRows[0].lastAvailableRows - Offset;
+    if (lastAvailableRow < limit && lastAvailableRow >= 0) {
+        limit = lastAvailableRow;
+        noMoreData = true
+    }
+
+    const numberOfPage = Math.ceil(availableRows[0].lastAvailableRows / limit)
+
+    if (lastAvailableRow > 0) {
+        const offsetValue = parseInt(Offset);
+        const limitValue = parseInt(limit);
+        activityHistory = await activityHistortyServices.GetActivityHistory(ActivityID, limitValue, offsetValue)
+    } else {
+        noMoreData = true;
+    }
+
+    res.send({ activityHistory, numberOfPage, noMoreData })
 }
 
 module.exports = {
