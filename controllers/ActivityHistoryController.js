@@ -86,10 +86,17 @@ const GetBestActivityStreak = async (ActivityID, UserID) => {
     return StreakCounterBackUp
 }
 
+const GetActivityHistory = async (req, res) => {
+    const { ActivityID } = req.query
+    const activityHistory = await activityHistortyServices.GetActivityHistory(ActivityID)
+    res.send(activityHistory)
+}
+
 module.exports = {
     addActivityHistory,
     DeleteActivityHistory,
     UpdateNonSucceedActivity,
     GetTotalActivityCount,
-    GetBestActivityStreak
+    GetBestActivityStreak,
+    GetActivityHistory
 };

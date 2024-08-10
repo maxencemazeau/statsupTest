@@ -100,7 +100,7 @@ const GetTotalActivityCount = async (UserId) => {
 
 const UpdateNonSucceedActivity = (ActivityHistoryID) => {
     try {
-        const query = db.query(`UPDATE ActivityHistory set Succeed = -1 WHERE ActivityHistoryID = ?`, [ActivityHistoryID])
+        const query = db.query(`UPDATE ActivityHistory set Succeed = -1 WHERE ActivityHistoryID = ? AND Succeed <> 1`, [ActivityHistoryID])
         return (query[0])
     } catch (err) {
         console.log(err)
@@ -110,6 +110,20 @@ const UpdateNonSucceedActivity = (ActivityHistoryID) => {
 const GetBestActivityStreak = async (ActivityID, UserID) => {
     try {
         const [query] = await db.query(`SELECT Succeed FROM ActivityHistory WHERE ActivityId = ? AND UserID = ? AND (Succeed = 1 OR Succeed = -1)`, [ActivityID, UserID])
+        return [query][0]
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+const GetActivityHistory = async (ActivityID) => {
+    try {
+        const [query] = await db.query(`SELECT ActivityHistoryID, Succeed, DATE_FORMAT(TimeStamp, '%Y-%m-%d') as TimeStamp, Count, ActivityHistory.ActivityID, Frequence 
+            FROM ActivityHistory 
+            INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
+            INNER JOIN Goals ON Goals.GoalsID = Activity.GoalsID
+            WHERE ActivityHistory.ActivityID = ?
+            ORDER BY ActivityHistoryID DESC`, [ActivityID])
         return [query][0]
     } catch (err) {
         console.log(err)
@@ -127,5 +141,6 @@ module.exports = {
     ActivityStatsByWeek,
     ActivityStatsByMonth,
     ActivityStatsByDay,
-    GetBestActivityStreak
+    GetBestActivityStreak,
+    GetActivityHistory
 }

@@ -1,4 +1,4 @@
-const historyFormattedDate = (historyDate) => {
+const historyFormattedDate = (historyDate, datePart = "") => {
     const today = new Date(historyDate);
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Les mois commencent à 0
@@ -14,8 +14,11 @@ const historyFormattedDate = (historyDate) => {
         day: today,
         fullDate: `${year}-${month}-${day}`,
     };
-
-    return `${year}-${month}-${day}`
+    if (datePart === "") {
+        return `${year}-${month}-${day}`
+    } else {
+        return formats[datePart]
+    }
 }
 
 module.exports = { historyFormattedDate }

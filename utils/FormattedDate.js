@@ -11,7 +11,7 @@ const FormattedDate = (datePart) => {
         year: year,
         month: month,
         week: week,
-        day: today,
+        day: day,
         fullDate: `${year}-${month}-${day}`,
     };
 

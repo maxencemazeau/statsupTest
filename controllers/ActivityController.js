@@ -3,6 +3,7 @@ const goalServices = require("../services/GoalServices");
 const activityHistortyServices = require("../services/ActivityHistoryServices")
 const activityHistoryController = require("../controllers/ActivityHistoryController")
 const { FormattedDate } = require("../utils/FormattedDate");
+const { historyFormattedDate } = require('../utils/historyFormattedDate')
 const { getWeek } = require("../utils/getWeek");
 
 const userActivity = async (req, res) => {
@@ -25,27 +26,31 @@ const userActivity = async (req, res) => {
   }
 
   if (activity.length > 0) {
-    let TodayDate = FormattedDate('day')
+    let TodayDate = FormattedDate('fullDate')
     for (i = 0; i < activity.length; i++) {
       if (activity[i].TimeStamp !== null) {
-        let activityDate = new Date(activity[i].TimeStamp)
-        let activityMonth = activityDate.getMonth() + 1
-        let thisWeek = FormattedDate('week')
+        let activityDate = activity[i].TimeStamp
         switch (activity[i].TimeFrameID) {
           case 1: //Monthly
-            if (activityMonth !== TodayDate.getMonth() + 1) {
+            let activityMonth = activityDate.substring(5, 7)
+            let activityYear = activityDate.substring(0, 4)
+            let TodayMonth = TodayDate.substring(5, 7)
+            let TodayYear = TodayDate.substring(0, 4)
+            if (`${activityYear}-${activityMonth}` !== `${TodayYear}-${TodayMonth}`) {
               activity[i].Count = 0
               activityHistoryController.UpdateNonSucceedActivity(activity[i].ActivityHistoryID)
             }
             break;
           case 2: //Weekly
-            if (getWeek(activityDate) !== thisWeek) {
+            let thisWeek = historyFormattedDate(TodayDate, 'week')
+            let activityWeek = historyFormattedDate(activityDate, 'week')
+            if (activityWeek !== thisWeek) {
               activity[i].Count = 0
               activityHistoryController.UpdateNonSucceedActivity(activity[i].ActivityHistoryID)
             }
             break;
           case 3: //Daily
-            if (activityDate.getDay() + 1 !== TodayDate.getDay() + 1) {
+            if (activityDate !== TodayDate) {
               activity[i].Count = 0
               activityHistoryController.UpdateNonSucceedActivity(activity[i].ActivityHistoryID)
             }
