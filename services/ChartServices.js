@@ -3,8 +3,8 @@ const db = require("../db")
 const GetActivityChartData = async (ActivityId) => {
     try {
         const [query] = await db.query(`SELECT 
-            DAYNAME(TimeStamp) AS days,
-            COUNT(ActivityId) AS activityCount
+            TimeStamp,
+            COUNT(ActivityId) AS NbActivity
         FROM 
             ActivityHistory
         WHERE 
@@ -40,4 +40,17 @@ const GetThisMonthChart = async (ActivityId) => {
     }
 }
 
-module.exports = { GetActivityChartData, GetThisMonthChart }
+const GetPrevious3MonthOrYear = async (StartDate, EndDate, ActivityId) => {
+    try {
+        const [query] = await db.query(`SELECT COUNT(ActivityID) as NbActivity, TimeStamp 
+            FROM ActivityHistory 
+            WHERE TimeStamp BETWEEN ? AND ? AND ActivityID = ?
+            GROUP BY MONTH(TimeStamp)`, [StartDate, EndDate, ActivityId])
+        return [query][0]
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+
+module.exports = { GetActivityChartData, GetThisMonthChart, GetPrevious3MonthOrYear }
