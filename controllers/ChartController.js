@@ -6,7 +6,6 @@ const GetActivityChartData = async (req, res) => {
     let chartData = []
     let startDate
     let endDate
-    console.log(ChartFrame)
     const todayDate = new Date()
     switch (ChartFrame) {
         case '1':
@@ -14,8 +13,10 @@ const GetActivityChartData = async (req, res) => {
             console.log(chartData)
             break;
         case '2':
-            chartData = await chartService.GetThisMonthChart(ActivityId)
-            console.log(chartData)
+            startDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1)
+            startDate = startDate.toISOString().split('T')[0]
+            endDate = todayDate.toISOString().split('T')[0]
+            chartData = await chartService.GetThisMonthChart(startDate, endDate, ActivityId)
             break;
         case '3':
             let fullYear = new Date().getFullYear()
@@ -24,7 +25,6 @@ const GetActivityChartData = async (req, res) => {
             startDate = startDate.toISOString().split('T')[0]
             endDate = todayDate.toISOString().split('T')[0]
             chartData = await chartService.GetPrevious3MonthOrYear(startDate, endDate, ActivityId)
-            console.log(chartData)
             break;
         case '4':
             startDate = new Date(todayDate)
@@ -32,7 +32,6 @@ const GetActivityChartData = async (req, res) => {
             startDate.setMonth(todayDate.getMonth() - 3)
             startDate = startDate.toISOString().split('T')[0]
             chartData = await chartService.GetPrevious3MonthOrYear(startDate, endDate, ActivityId)
-            console.log(chartData)
             break;
         case '5':
             break;

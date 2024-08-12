@@ -19,21 +19,12 @@ const GetActivityChartData = async (ActivityId) => {
     }
 }
 
-const GetThisMonthChart = async (ActivityId) => {
+const GetThisMonthChart = async (StartDate, EndDate, ActivityId) => {
     try {
-        const [query] = await db.query(`SELECT 
-                    DATE(timeStamp) AS day,
-                    COUNT(*) AS count
-                    FROM 
-                    ActivityHistory
-                    WHERE 
-                    YEAR(timeStamp) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
-                    AND MONTH(timeStamp) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
-                    AND ActivityID = ?
-                    GROUP BY 
-                    DATE(timeStamp)
-                    ORDER BY 
-                    day;`, [ActivityId])
+        const [query] = await db.query(`SELECT COUNT(ActivityID) as NbActivity, TimeStamp 
+            FROM ActivityHistory 
+            WHERE TimeStamp BETWEEN ? AND ? AND ActivityID = ?
+            GROUP BY TimeStamp`, [StartDate, EndDate, ActivityId])
         return [query][0]
     } catch (err) {
         console.log(err)
