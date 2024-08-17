@@ -9,6 +9,9 @@ function goalRoutes(fastify, options, done) {
     fastify.delete("/deleteGoal", goalController.DeleteGoal)
     fastify.get("/getAllUserGoal", goalController.GetAllUserGoal)
     fastify.put("/updateGoal", goalController.UpdateGoal)
+    fastify.get("/getUserGoalByID", goalController.GetUserGoalByID)
+    fastify.get("/getLinkedActivityToGoal", goalController.GetLinkedActivityToGoal)
+    fastify.get("/getAllActivityGoalStats", goalController.GetAllActivityStatsForGoal)
     done()
 }
 

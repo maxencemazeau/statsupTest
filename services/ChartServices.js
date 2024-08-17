@@ -43,5 +43,15 @@ const GetPrevious3MonthOrYear = async (StartDate, EndDate, ActivityId) => {
     }
 }
 
+const GetAllTimeData = async (ActivityId) => {
+    try {
+        const [query] = await db.query(`SELECT COUNT(ActivityID) as NbActivity, YEAR(TimeStamp) as TimeStamp
+            FROM ActivityHistory WHERE ActivityID = ? GROUP BY YEAR(TimeStamp)`, [ActivityId])
+        return [query][0]
+    } catch (err) {
+        console.log(err)
+    }
+}
 
-module.exports = { GetActivityChartData, GetThisMonthChart, GetPrevious3MonthOrYear }
+
+module.exports = { GetActivityChartData, GetThisMonthChart, GetPrevious3MonthOrYear, GetAllTimeData }

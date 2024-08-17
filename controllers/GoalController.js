@@ -80,4 +80,86 @@ const UpdateGoal = async (req, res) => {
     }
 }
 
-module.exports = { userGoal, addGoal, CheckDuplicate, DeleteGoal, GetAllUserGoal, UpdateGoal }
+const GetUserGoalByID = async (req, res) => {
+    const { GoalsID, UserID } = req.query
+    const goal = await goalServices.GetUserGoalByID(GoalsID)
+    res.send(goal)
+}
+
+const GetLinkedActivityToGoal = async (req, res) => {
+    const { GoalsID } = req.query
+    let linkedActivity = await goalServices.GetLinkedActivityToGoal(GoalsID)
+    linkedActivity = linkedActivity.map(activity => ({
+        ...activity,
+        checked: activity.checked === 1 // Convert 1 to true and 0 to false
+    }));
+    res.send(linkedActivity)
+}
+
+const GetAllActivityStatsForGoal = async (req, res) => {
+    const { GoalID, TimeFrame } = req.query
+    let activtiesStat = []
+
+    switch (parseInt(TimeFrame)) {
+        case 1:
+            activtiesStat = await goalServices.ActivityGoalStatsByMonth(GoalID)
+            break;
+        case 2:
+            activtiesStat = await goalServices.ActivityGoalStatsByWeek(GoalID)
+            break;
+        case 3:
+            activtiesStat = await goalServices.ActivityGoalStatsByDay(GoalID)
+            break;
+    }
+
+    let activitiesBestStreak = await GetAllActivityBestStreak(GoalID)
+
+    activtiesStat = activtiesStat.map(activites => {
+        const bestStreak = activitiesBestStreak.find((streak) => streak.ActivityID === activites.ActivityID);
+        if (bestStreak !== undefined) {
+            return { ...activites, BestStreak: bestStreak.BestStreak };
+        }
+        return activity;
+    })
+
+    res.send(activtiesStat)
+}
+
+const GetAllActivityBestStreak = async (GoalID) => {
+    const history = await goalServices.GetAllActivityBestStreak(GoalID)
+    let StreakCounter = 0
+    let StreakCounterBackUp = 0
+    let ActivityIDBackUp = 0
+    let BestStreakByActivity = []
+    for (i = 0; i < history.length; i++) {
+        if (history[i].ActivityID !== ActivityIDBackUp) {
+            if (ActivityIDBackUp !== 0) {
+                BestStreakByActivity.push({ ActivityID: ActivityIDBackUp, BestStreak: StreakCounterBackUp })
+            }
+
+            ActivityIDBackUp = history[i].ActivityID
+            StreakCounter = 0
+            StreakCounterBackUp = 0
+        }
+
+        if (history[i].Succeed === 1) {
+            StreakCounter++
+            if (StreakCounter > StreakCounterBackUp) {
+                StreakCounterBackUp = StreakCounter
+            }
+        } else {
+            StreakCounter = 0
+        }
+    }
+
+    // Ajoute la dernière activité au tableau
+    if (ActivityIDBackUp !== 0) {
+        BestStreakByActivity.push({ ActivityID: ActivityIDBackUp, BestStreak: StreakCounterBackUp });
+    }
+    return BestStreakByActivity
+}
+
+module.exports = {
+    userGoal, addGoal, CheckDuplicate, DeleteGoal, GetAllUserGoal, UpdateGoal, GetUserGoalByID, GetLinkedActivityToGoal, GetAllActivityStatsForGoal,
+    GetAllActivityBestStreak
+}

@@ -88,7 +88,11 @@ const addActivity = async (req, res) => {
 
 const ActivityWithoutGoal = async (req, res) => {
   const { id } = req.query;
-  const getActivityWithoutGoal = await activityServices.ActivityWithoutGoal(id);
+  let getActivityWithoutGoal = await activityServices.ActivityWithoutGoal(id);
+  getActivityWithoutGoal = getActivityWithoutGoal.map(activity => ({
+    ...activity,
+    checked: activity.checked === false // Convert 1 to true and 0 to false
+  }));
   res.send(getActivityWithoutGoal);
 };
 

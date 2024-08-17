@@ -3,15 +3,6 @@ const db = require("../db");
 const ActivityById = async (id, limit, offset) => {
   try {
     const query = await db.query(
-      //   `SELECT ActivityID, ActivityName, Frequence, Frame, Activity.UserID, Timer, Goals.GoalName
-      // FROM Activity
-      // LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
-      // LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
-      // LEFT JOIN (
-      //   SELECT MAX(ActivityHistoryID) as ActivityHistoryID, TimeStamp
-      //   FROM ActivityHistory 
-      // )
-      // WHERE Activity.UserID = ? ORDER BY ActivityID DESC LIMIT ? OFFSET ?`,
       `SELECT 
     Activity.ActivityID, 
     Activity.ActivityName, 
@@ -48,11 +39,12 @@ const ActivityById = async (id, limit, offset) => {
 const ActivityWithoutGoal = async (id) => {
   try {
     const query = await db.query(
-      `SELECT ActivityID, ActivityName FROM Activity WHERE UserID = ? AND GoalsID = 0 OR GoalsID IS NULL`,
+      `SELECT ActivityID, ActivityName, 
+      false as checked
+      FROM Activity WHERE UserID = ? AND GoalsID = 0 OR GoalsID IS NULL`,
       [id]
     );
     return query[0];
-    console.log(query[0])
   } catch (err) {
     return err;
   }
