@@ -1,4 +1,4 @@
-const mysql = require ('mysql2/promise');
+const mysql = require('mysql2/promise');
 
 const connection = mysql.createPool({
     host: 'maxencemazeauportfolio.com',
@@ -7,8 +7,7 @@ const connection = mysql.createPool({
     database: 'u962314789_StatsUp',
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
-
+    queueLimit: 0,
 })
 
 module.exports = connection;
