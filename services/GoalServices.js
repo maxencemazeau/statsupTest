@@ -48,11 +48,15 @@ const GetAllUserGoal = async (UserId) => {
 }
 
 const UpdateGoal = async (GoalName, TimeFrameID, Frequence, GoalsID) => {
-    const query = await db.query(`UPDATE Goals set GoalName = ?, TimeFrameID = ?, Frequence = ? WHERE GoalsID = ?`, [GoalName, TimeFrameID, Frequence, GoalsID])
-    if (query[0].affectedRows > 0) {
-        return 1
-    } else {
-        return 0
+    try {
+        const query = await db.query(`UPDATE Goals set GoalName = ?, TimeFrameID = ?, Frequence = ? WHERE GoalsID = ?`, [GoalName, TimeFrameID, Frequence, GoalsID])
+        if (query[0].affectedRows > 0) {
+            return 1
+        } else {
+            return 0
+        }
+    } catch (err) {
+        console.log(err)
     }
 }
 
