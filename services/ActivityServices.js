@@ -117,8 +117,14 @@ const UpdateActivity = async (ActivityId, ActivityName, GoalsId) => {
   } catch (err) {
     console.log(err)
   }
+}
 
-
+const UpdateActivityFromGoal = async (GoalsID, ActivityID) => {
+  try {
+    const query = await db.query(`UPDATE Activity set GoalsID = ? WHERE ActivityID = ?`, [GoalsID, ActivityID])
+  } catch {
+    console.log(err)
+  }
 }
 
 module.exports = {
@@ -130,5 +136,6 @@ module.exports = {
   CheckNameDuplicate,
   DeleteActivity,
   GetUserActivityByID,
-  UpdateActivity
+  UpdateActivity,
+  UpdateActivityFromGoal
 };

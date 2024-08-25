@@ -70,8 +70,14 @@ const GetAllUserGoal = async (req, res) => {
 }
 
 const UpdateGoal = async (req, res) => {
-    const { GoalsId, GoalName, TimeFrameID, Frequence } = req.body.params
+    const { GoalsId, GoalName, TimeFrameID, Frequence, LinkActivity } = req.body.params
     const hasGoalbeenUpdated = await goalServices.UpdateGoal(GoalName, TimeFrameID, Frequence, GoalsId)
+
+    if (LinkActivity.length > 0) {
+        for (i = 0; i < LinkActivity.length; i++) {
+            await activityServices.UpdateActivityFromGoal(GoalsId, LinkActivity[i])
+        }
+    }
     if (hasGoalbeenUpdated === 1) {
         res.send(1)
     } else {
