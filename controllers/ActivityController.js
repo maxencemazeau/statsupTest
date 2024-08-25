@@ -66,9 +66,7 @@ const userActivity = async (req, res) => {
 const addActivity = async (req, res) => {
   let addActivity = false;
   let newGoalId = 0;
-  console.log("ici")
   const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId } = req.body.params;
-  console.log(req.body.params)
   if (CreateNewGoal !== true) {
     if (GoalsId == 0) {
       GoalsId = null
@@ -159,6 +157,11 @@ const UpdateActivity = async (req, res) => {
   }
 }
 
+const UpdateActivityFromGoal = async (GoalsId, ActivityId) => {
+  const hasActivityBeenUpdated = await activityServices.UpdateActivityFromGoal(GoalsId, ActivityId)
+  return hasActivityBeenUpdated
+}
+
 module.exports = {
   userActivity,
   addActivity,
@@ -166,5 +169,6 @@ module.exports = {
   CheckDuplicate,
   DeleteActivity,
   GetUserActivityByID,
-  UpdateActivity
+  UpdateActivity,
+  UpdateActivityFromGoal
 };
