@@ -6,6 +6,13 @@ const GetProfilInfoAndStats = async (req, res) => {
     res.send(userProfil)
 }
 
+const GetActivityProfilList = async(req, res) => {
+    const { UserId } = req.query
+    const activityList = await profilServices.GetActivityProfilList(UserId)
+    res.send(activityList)
+}
+
 module.exports = {
-    GetProfilInfoAndStats
+    GetProfilInfoAndStats,
+    GetActivityProfilList
 }

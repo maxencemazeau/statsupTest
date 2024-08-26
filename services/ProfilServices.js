@@ -36,9 +36,15 @@ const GetProfilInfoAndStats = async (UserId) => {
     } catch (err) {
         console.log(err)
     }
+}
 
+const GetActivityProfilList = async(UserId) => {
+    const query = await db.query(`SELECT ActivityName FROM Activity 
+    WHERE Activity.UserID = ?`, [UserId])
+    return query[0]
 }
 
 module.exports = {
-    GetProfilInfoAndStats
+    GetProfilInfoAndStats,
+    GetActivityProfilList
 }
