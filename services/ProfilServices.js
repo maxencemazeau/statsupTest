@@ -1,5 +1,30 @@
 const db = require('../db')
 
+const GetMyProfil = async (UserId) => {
+    const query = await db.query(`SELECT FirstName, LastName, UserID FROM User 
+        WHERE User.UserID = ?`, [UserId])
+    return query[0]
+}
+
+const GetOtherProfil = async (UserId, MyUserID) => {
+    const query = await db.query(`SELECT 
+    User.FirstName, 
+    User.LastName, 
+    User.UserID, 
+    CASE 
+        WHEN Follow.FollowID IS NOT NULL THEN 1
+        ELSE 0
+    END AS isFollowing
+FROM 
+    User
+LEFT JOIN 
+    Follow 
+    ON User.UserID = Follow.FollowingID AND Follow.FollowerID = ?
+WHERE 
+    User.UserID = ?`, [MyUserID, UserId])
+    return query[0]
+}
+
 const GetProfilInfoAndStats = async (UserId) => {
     try {
         const query = await db.query(`SELECT 
@@ -24,12 +49,8 @@ const GetProfilInfoAndStats = async (UserId) => {
             COUNT(CASE WHEN Succeed = 1 OR Succeed = -1 THEN 1 END) AS TotalGoals,
             
             (COUNT(CASE WHEN Succeed = 1 THEN 1 END) * 100 / COUNT(*)) AS SuccessRate,
-            COUNT(ActivityHistory.ActivityID) as TotalActivity,
-            User.FirstName,
-            User.LastName,
-            User.UserID
+            COUNT(ActivityHistory.ActivityID) as TotalActivity
         FROM ActivityHistory
-        INNER JOIN User ON User.UserID = ActivityHistory.UserID
         WHERE ActivityHistory.UserID = ?
         `, [UserId, UserId, UserId])
         return query[0]
@@ -38,13 +59,32 @@ const GetProfilInfoAndStats = async (UserId) => {
     }
 }
 
-const GetActivityProfilList = async(UserId) => {
-    const query = await db.query(`SELECT ActivityName FROM Activity 
-    WHERE Activity.UserID = ?`, [UserId])
+const GetActivityProfilList = async (UserId) => {
+    const query = await db.query(`SELECT 
+    Activity.ActivityName, 
+    Activity.ActivityID,
+    Goals.GoalName,
+    Goals.Frequence,
+    Frame,
+    COUNT(ActivityHistory.ActivityID) as TotalActivity,
+    COUNT(CASE WHEN Succeed = 1 THEN 1 END) AS TotalAchievedGoals,     
+    COUNT(CASE WHEN Succeed = 1 OR Succeed = -1 THEN 1 END) AS TotalGoals 
+    FROM 
+    Activity
+    LEFT JOIN 
+    ActivityHistory ON Activity.ActivityID = ActivityHistory.ActivityID
+    LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID 
+    LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
+    WHERE 
+    ActivityHistory.UserID = ?
+    GROUP BY 
+    Activity.ActivityID;`, [UserId])
     return query[0]
 }
 
 module.exports = {
+    GetMyProfil,
+    GetOtherProfil,
     GetProfilInfoAndStats,
     GetActivityProfilList
 }

@@ -11,6 +11,7 @@ const activityHistoryroutes = require("./routes/ActivityHistoryRoutes")
 const chartRoutes = require("./routes/ChartRoutes")
 const searchFriendRoutes = require("./routes/SearchFriendRoutes");
 const profilRoutes = require('./routes/ProfilRoutes');
+const friendRoutes = require("./routes/FriendRoutes")
 
 fastify.register(cors, {
   origin: '*',
@@ -25,6 +26,7 @@ fastify.register(activityHistoryroutes)
 fastify.register(chartRoutes)
 fastify.register(searchFriendRoutes)
 fastify.register(profilRoutes)
+fastify.register(friendRoutes)
 
 fastify.listen({ port, host: "0.0.0.0" }, (err, address) => {
   if (err) {
