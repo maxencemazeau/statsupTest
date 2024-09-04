@@ -19,6 +19,9 @@ fastify.register(cors, {
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
 });
 
+fastify.register(require('@fastify/multipart'), {
+  limits: { fileSize: 10 * 1024 * 1024 }, // Example: 10MB limit
+});
 fastify.register(userRoutes);
 fastify.register(activityRoutes)
 fastify.register(goalRoutes)

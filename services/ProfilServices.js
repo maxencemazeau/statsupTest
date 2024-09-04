@@ -1,7 +1,7 @@
 const db = require('../db')
 
 const GetMyProfil = async (UserId) => {
-    const query = await db.query(`SELECT FirstName, LastName, UserID FROM User 
+    const query = await db.query(`SELECT FirstName, LastName, UserID, Photo FROM User 
         WHERE User.UserID = ?`, [UserId])
     return query[0]
 }
@@ -82,9 +82,38 @@ const GetActivityProfilList = async (UserId) => {
     return query[0]
 }
 
+const GetBestGoalStreak = async (UserId) => {
+    try {
+        const query = await db.query(`SELECT Activity.ActivityID ,Succeed FROM ActivityHistory 
+                    INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
+                    INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+                    WHERE ActivityHistory.UserID = ? AND (Succeed = 1 OR Succeed = -1)
+                    ORDER BY ActivityID`, [UserId])
+        return query[0]
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+const ChangeProfilPhoto = async (Photo, UserID) => {
+    try {
+        const query = await db.query(`UPDATE User set Photo = ? WHERE UserID = ?`, [Photo, UserID])
+
+        if (query.affectedRows > 0) {
+            return 1
+        } else {
+            return 0
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 module.exports = {
     GetMyProfil,
     GetOtherProfil,
     GetProfilInfoAndStats,
-    GetActivityProfilList
+    GetActivityProfilList,
+    GetBestGoalStreak,
+    ChangeProfilPhoto
 }

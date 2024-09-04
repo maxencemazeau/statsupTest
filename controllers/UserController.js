@@ -2,7 +2,6 @@ const userServices = require('../services/UserServices');
 
 const userLogin = async (req, res) => {
     const { email, password } = req.body;
-    console.log('Login request received:', email, password); // Log request data for debugging
     try {
         const user = await userServices.userLoginService(email, password);
         if (user) {
@@ -26,16 +25,17 @@ const getAllUsers = async (req, res) => {
 };
 
 const userSignUp = async (req, res) => {
-    const { email, username, password } = req.body;
+    const { email, firstName, lastName, password } = req.body;
     try {
-        const user = await userServices.userSignUpService(email, username, password);
+        const username = firstName + " " + lastName
+        const user = await userServices.userSignUpService(email, firstName, lastName, username, password);
         res.status(201).send(user);
     } catch (error) {
         res.status(500).send({ error: 'Internal Server Error' });
     }
 };
 
-const user = async(req, res) => {
+const user = async (req, res) => {
     const user = await userServices.user()
     res.send(user)
 }

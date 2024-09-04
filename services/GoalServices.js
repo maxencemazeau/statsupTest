@@ -152,7 +152,7 @@ const ActivityGoalStatsByMonth = async (GoalID) => {
             Goals.GoalsID = ?
             GROUP BY ActivityHistory.ActivityID
     `, [GoalID])
-        return query[0]
+        return query
     } catch (err) {
         console.log(err)
     }
@@ -163,7 +163,7 @@ const GetAllActivityBestStreak = async (GoalID) => {
     const query = await db.query(`SELECT Activity.ActivityID ,Succeed FROM ActivityHistory 
                     INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
                     INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
-                    WHERE Goals.GoalsID = 25 AND ActivityHistory.UserID = 67 AND (Succeed = 1 OR Succeed = -1)
+                    WHERE Goals.GoalsID = ? AND ActivityHistory.UserID = 67 AND (Succeed = 1 OR Succeed = -1)
                     ORDER BY ActivityID`, [GoalID])
     return query[0]
 }

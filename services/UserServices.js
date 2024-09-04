@@ -9,7 +9,7 @@ const userLoginService = async (email, password) => {
     try {
         // Query user from the database
         const query = await db.query('SELECT UserID ,Email, Password FROM User WHERE email = ?', [email]);
-        const user = query[0];
+        let user = query[0];
 
         // If user not found, return null
         if (!user) {
@@ -22,7 +22,7 @@ const userLoginService = async (email, password) => {
         // If passwords match, generate token and return user with token
         if (passwordMatch) {
             const token = jwt.sign({ id: user.UserID, email: user.Email }, JWT_SECRET, { expiresIn: '1h' });
-            console.log(user)
+            user = query[0][0]
             return { user, token };
         } else {
             return null; // Incorrect password case
@@ -39,7 +39,7 @@ const getAllUsersService = async () => {
     return query;
 };
 
-const userSignUpService = async (email, username, password) => {
+const userSignUpService = async (email, firstName, lastName, username, password) => {
     try {
         // Check if email already exists
         const existingUserQuery = await db.query('SELECT Email FROM User WHERE email = ?', [email]);
@@ -49,7 +49,7 @@ const userSignUpService = async (email, username, password) => {
             // Email already exists
             return { error: 'Email already in use' };
 
-            } else {
+        } else {
             // Check if username already exists
             const existingUsernameQuery = await db.query('SELECT Username FROM User WHERE username = ?', [username]);
             const existingUsername = existingUsernameQuery[0]; // Extract the first row of results
@@ -58,9 +58,9 @@ const userSignUpService = async (email, username, password) => {
                 // Username already exists
                 return { error: 'Username already in use' };
             }
-        
-         }
-    
+
+        }
+
 
 
 
@@ -68,14 +68,14 @@ const userSignUpService = async (email, username, password) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insert the new user into the database
-        const query = await db.query('INSERT INTO User (email, username, password) VALUES (?, ?, ?)', [email, username, hashedPassword]);
+        const query = await db.query('INSERT INTO User (email, firstName, lastName, username, password) VALUES (?, ?, ?, ?, ?)', [email, firstName, lastName, username, hashedPassword]);
 
         // Check if the user was successfully created
-        if (query && query.affectedRows > 0) {
-            const user = { id: query.insertId, email, username };
+        if (query && query[0].affectedRows > 0) {
+            const user = { UserID: query[0].insertId, email, username };
             const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
             return { user, token };
-        } 
+        }
 
     } catch (error) {
         console.error('Error in userSignUpService:', error);
@@ -83,7 +83,7 @@ const userSignUpService = async (email, username, password) => {
     }
 };
 
-const user = async() => {
+const user = async () => {
     const query = await db.query('SELECT * FROM User')
     return query[0]
 }
