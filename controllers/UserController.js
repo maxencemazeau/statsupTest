@@ -1,9 +1,13 @@
 const userServices = require('../services/UserServices');
+const { ConvertPhotoToUri } = require("../utils/convertPhotoToUri");
 
 const userLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await userServices.userLoginService(email, password);
+        if (user !== null && user.user.Photo !== null) {
+            user.user.Photo = ConvertPhotoToUri(user.user.Photo)
+        }
         if (user) {
             res.status(200).send(user);
         } else {

@@ -10,11 +10,8 @@ const GetProfilInfoAndStats = async (req, res) => {
     }
     const userProfil = await profilServices.GetProfilInfoAndStats(UserId)
 
-    if (userInfo.length > 0) {
-        const photoBlob = userInfo[0].Photo
-        const photoBase64 = photoBlob.toString('base64');
-        const photoDataUri = `data:image/jpeg;base64,${photoBase64}`;
-        userInfo[0].Photo = photoDataUri
+    if (userInfo.length > 0 && userInfo[0].Photo !== null) {
+        userInfo[0].Photo = ConvertPhotoToUri(userInfo[0].Photo)
     }
 
     res.send({ userInfo, userProfil })

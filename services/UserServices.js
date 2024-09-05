@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const userLoginService = async (email, password) => {
     try {
         // Query user from the database
-        const query = await db.query('SELECT UserID ,Email, Password FROM User WHERE email = ?', [email]);
+        const query = await db.query('SELECT UserID ,Email, Password, Photo FROM User WHERE email = ?', [email]);
         let user = query[0];
 
         // If user not found, return null

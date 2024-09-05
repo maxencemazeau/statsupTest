@@ -2,7 +2,7 @@ const db = require("../db")
 
 const GetUserSearch = async (UserID, search) => {
     try {
-        const query = await db.query(`SELECT FirstName, LastName, FollowingID, FollowerID, UserID,
+        const query = await db.query(`SELECT FirstName, LastName, FollowingID, FollowerID, UserID, Photo,
             CASE 
             WHEN Follow.FollowerID IS NOT NULL AND Follow.FollowerID = ? THEN 1
             ELSE 0

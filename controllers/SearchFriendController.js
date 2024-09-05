@@ -1,10 +1,17 @@
 
 const searchFriendServices = require("../services/SearchFriendServices")
-
+const { ConvertPhotoToUri } = require("../utils/convertPhotoToUri");
 
 const GetUserSearch = async (req, res) => {
     const { UserID, search } = req.query
     const userList = await searchFriendServices.GetUserSearch(UserID, search)
+    if (userList.length > 0) {
+        for (i = 0; i < userList.length; i++) {
+            if (userList[i].Photo !== null) {
+                userList[i].Photo = ConvertPhotoToUri(userList[i].Photo)
+            }
+        }
+    }
     res.send(userList)
 }
 
