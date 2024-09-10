@@ -11,6 +11,7 @@ const GetOtherProfil = async (UserId, MyUserID) => {
     User.FirstName, 
     User.LastName, 
     User.UserID, 
+    User.Photo,
     CASE 
         WHEN Follow.FollowID IS NOT NULL THEN 1
         ELSE 0

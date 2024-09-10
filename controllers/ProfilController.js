@@ -1,4 +1,5 @@
 const profilServices = require('../services/ProfilServices')
+const { ConvertPhotoToUri } = require("../utils/convertPhotoToUri");
 
 const GetProfilInfoAndStats = async (req, res) => {
     const { UserId, myUserId } = req.query
