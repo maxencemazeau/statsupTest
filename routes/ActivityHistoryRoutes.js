@@ -6,7 +6,7 @@ function ActivityHistoryRoutes(fastify, options, done) {
     fastify.get("/getTotalActivityCompleted", activityHistoryController.GetTotalActivityCount)
     fastify.get("/getBestActivityStreak", activityHistoryController.GetBestActivityStreak)
     fastify.get("/getActivityHistory", activityHistoryController.GetActivityHistory)
-    //fastify.put("/updateCompletedActivity", activityController.UpdateCompletedActivity)
+    fastify.put("/updateActivityHistory", activityHistoryController.UpdateActivityHistory)
 
     done();
 }

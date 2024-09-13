@@ -4,7 +4,7 @@ const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
 
 const addActivityHistory = async (req, res) => {
-    const { ActivityHistoryID, ActivityID, TimeStamp, Count, Frequence, UserID } = req.body.params
+    const { ActivityID, TimeStamp, Count, Frequence, UserID, HoursSpent } = req.body.params
     let addHistory = 0
     const today = FormattedDate('fullDate')
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
@@ -18,9 +18,9 @@ const addActivityHistory = async (req, res) => {
         const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
         if (lastHistoryFormattedDate !== today) {
             if (Count >= hasTodayHistory.Frequence) {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent)
             } else {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent)
             }
         }
     }
@@ -35,7 +35,7 @@ const addActivityHistory = async (req, res) => {
 }
 
 const DeleteActivityHistory = async (req, res) => {
-    const { ActivityHistoryID, ActivityID, TimeStamp, Count } = req.query
+    const { ActivityID, TimeStamp, Count } = req.query
     const today = FormattedDate('fullDate')
 
     let deleteHistory = 0
@@ -56,6 +56,14 @@ const DeleteActivityHistory = async (req, res) => {
         console.log("Delete Error")
     }
     res.send("Success")
+}
+
+const UpdateActivityHistory = async (req, res) => {
+    const { ActivityID, HoursSpent } = req.body.params
+    const getLastActivityHistory = await activityHistortyServices.GetLastActivityHistory(ActivityID)
+    const newHoursSpent = getLastActivityHistory.HoursSpent + HoursSpent
+    const updatedActivity = activityHistortyServices.UpdateActivityHistory(newHoursSpent, getLastActivityHistory.ActivityHistoryID)
+    res.send("Updated")
 }
 
 const GetTotalActivityCount = async (req, res) => {
@@ -117,5 +125,6 @@ module.exports = {
     UpdateNonSucceedActivity,
     GetTotalActivityCount,
     GetBestActivityStreak,
-    GetActivityHistory
+    GetActivityHistory,
+    UpdateActivityHistory
 };

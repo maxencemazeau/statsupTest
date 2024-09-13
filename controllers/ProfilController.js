@@ -1,5 +1,6 @@
 const profilServices = require('../services/ProfilServices')
 const { ConvertPhotoToUri } = require("../utils/convertPhotoToUri");
+const { convertFloatToHour } = require('../utils/convertFloatToTime')
 
 const GetProfilInfoAndStats = async (req, res) => {
     const { UserId, myUserId } = req.query
@@ -13,6 +14,12 @@ const GetProfilInfoAndStats = async (req, res) => {
 
     if (userInfo.length > 0 && userInfo[0].Photo !== null) {
         userInfo[0].Photo = ConvertPhotoToUri(userInfo[0].Photo)
+    }
+
+    if (userProfil[0].totalTime > 0) {
+        const { hours, minutes } = convertFloatToHour(userProfil[0].totalTime)
+        userProfil[0].Hour = hours
+        userProfil[0].minutes = minutes
     }
 
     res.send({ userInfo, userProfil })

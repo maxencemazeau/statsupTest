@@ -48,7 +48,7 @@ const GetProfilInfoAndStats = async (UserId) => {
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) AS TotalAchievedGoals,
             
             COUNT(CASE WHEN Succeed = 1 OR Succeed = -1 THEN 1 END) AS TotalGoals,
-            
+            SUM(HoursSpent) as totalTime,
             (COUNT(CASE WHEN Succeed = 1 THEN 1 END) * 100 / COUNT(*)) AS SuccessRate,
             COUNT(ActivityHistory.ActivityID) as TotalActivity
         FROM ActivityHistory

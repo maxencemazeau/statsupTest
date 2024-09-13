@@ -1,9 +1,14 @@
 const db = require("../db");
 const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
-const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID) => {
-    const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID) values (?,?,?,?,?)`, [ActivityID, TimeStamp, Count, Succeed, UserID])
-    return query[0].affectedRows
+const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent) => {
+    try {
+        const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent) values (?,?,?,?,?,?)`,
+            [ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent])
+        return query[0].affectedRows
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 const DeleteActivityHistory = async (ActivityHistoryID) => {
@@ -39,6 +44,7 @@ const ActivityStatsByWeek = async (ActivityId) => {
         const [query] = await db.query(`SELECT 
             COUNT(ActivityID) AS totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
             TIMESTAMPDIFF(WEEK, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
@@ -58,6 +64,7 @@ const ActivityStatsByDay = async (ActivityId) => {
         const [query] = await db.query(`SELECT 
             COUNT(ActivityID) AS totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
             TIMESTAMPDIFF(DAY, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
@@ -78,6 +85,7 @@ const ActivityStatsByMonth = async (ActivityId) => {
         const [query] = await db.query(`SELECT 
             COUNT(ActivityID) AS totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
             TIMESTAMPDIFF(MONTH, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
@@ -139,6 +147,22 @@ const rowsAfterOffset = async (ActivityID) => {
     return query[0];
 };
 
+const GetLastActivityHistory = async (ActivityID) => {
+    const query = await db.query(`SELECT ActivityHistoryID, HoursSpent 
+        FROM ActivityHistory 
+        WHERE ActivityID = ? ORDER BY ActivityHistoryID DESC LIMIT 1 `,
+        [ActivityID])
+    return query[0][0]
+}
+
+const UpdateActivityHistory = (HoursSpent, ActivityHistoryID) => {
+    try {
+        db.query(`UPDATE ActivityHistory set HoursSpent = ? WHERE ActivityHistoryID = ?`, [HoursSpent, ActivityHistoryID])
+    } catch (err) {
+        console.log(err)
+    }
+
+}
 
 module.exports = {
     AddActivityHistory,
@@ -152,5 +176,7 @@ module.exports = {
     ActivityStatsByDay,
     GetBestActivityStreak,
     GetActivityHistory,
-    rowsAfterOffset
+    rowsAfterOffset,
+    GetLastActivityHistory,
+    UpdateActivityHistory
 }
