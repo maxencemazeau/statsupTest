@@ -2,8 +2,10 @@ const userServices = require('../services/UserServices');
 const { ConvertPhotoToUri } = require("../utils/convertPhotoToUri");
 
 const userLogin = async (req, res) => {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
     try {
+        email = email.trim().toLowerCase()
+        password = password.trim()
         const user = await userServices.userLoginService(email, password);
         if (user !== null && user.user.Photo !== null) {
             user.user.Photo = ConvertPhotoToUri(user.user.Photo)
@@ -29,9 +31,13 @@ const getAllUsers = async (req, res) => {
 };
 
 const userSignUp = async (req, res) => {
-    const { email, firstName, lastName, password } = req.body;
+    let { email, firstName, lastName, password } = req.body;
     try {
+        firstName = firstName.trim().toLowerCase()
+        lastName = lastName.trim().toLowerCase()
+        password = password.trim()
         const username = firstName + " " + lastName
+        email = email.trim().toLowerCase();
         const user = await userServices.userSignUpService(email, firstName, lastName, username, password);
         res.status(201).send(user);
     } catch (error) {

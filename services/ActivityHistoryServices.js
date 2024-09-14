@@ -8,12 +8,18 @@ const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID,
         return query[0].affectedRows
     } catch (err) {
         console.log(err)
+        return 0
     }
 }
 
 const DeleteActivityHistory = async (ActivityHistoryID) => {
-    const query = await db.query(`DELETE FROM ActivityHistory WHERE ActivityHistoryID = ?`, [ActivityHistoryID])
-    return query[0].affectedRows
+    try {
+        const query = await db.query(`DELETE FROM ActivityHistory WHERE ActivityHistoryID = ?`, [ActivityHistoryID])
+        return query[0].affectedRows
+    } catch (err) {
+        console.log(err)
+        return 0
+    }
 }
 
 const CheckDuplicateHistory = async (ActivityID, TimeStamp, today) => {
@@ -31,6 +37,7 @@ const CheckDuplicateHistory = async (ActivityID, TimeStamp, today) => {
 
     } catch (err) {
         console.log(err)
+        return 0
     }
 }
 
@@ -155,11 +162,13 @@ const GetLastActivityHistory = async (ActivityID) => {
     return query[0][0]
 }
 
-const UpdateActivityHistory = (HoursSpent, ActivityHistoryID) => {
+const UpdateActivityHistory = async (HoursSpent, ActivityHistoryID) => {
     try {
-        db.query(`UPDATE ActivityHistory set HoursSpent = ? WHERE ActivityHistoryID = ?`, [HoursSpent, ActivityHistoryID])
+        const query = await db.query(`UPDATE ActivityHistory set HoursSpent = ? WHERE ActivityHistoryID = ?`, [HoursSpent, ActivityHistoryID])
+        return query[0].affectedRows
     } catch (err) {
         console.log(err)
+        return 0
     }
 
 }

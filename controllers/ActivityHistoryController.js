@@ -10,9 +10,9 @@ const addActivityHistory = async (req, res) => {
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
     if (hasTodayHistory === 0) {
         if (Frequence === Count) {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID)
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent)
         } else {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID)
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent)
         }
     } else {
         const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
@@ -28,10 +28,11 @@ const addActivityHistory = async (req, res) => {
 
     if (addHistory === 1) {
         console.log("Add Success")
+        res.send("Success")
     } else {
         console.log("Add Error")
+        res.send("Error")
     }
-    res.send("Success")
 }
 
 const DeleteActivityHistory = async (req, res) => {
@@ -52,10 +53,11 @@ const DeleteActivityHistory = async (req, res) => {
 
     if (deleteHistory === 1) {
         console.log("Delete Success")
+        res.send("Success")
     } else {
         console.log("Delete Error")
+        res.send("Error")
     }
-    res.send("Success")
 }
 
 const UpdateActivityHistory = async (req, res) => {
@@ -63,7 +65,9 @@ const UpdateActivityHistory = async (req, res) => {
     const getLastActivityHistory = await activityHistortyServices.GetLastActivityHistory(ActivityID)
     const newHoursSpent = getLastActivityHistory.HoursSpent + HoursSpent
     const updatedActivity = activityHistortyServices.UpdateActivityHistory(newHoursSpent, getLastActivityHistory.ActivityHistoryID)
-    res.send("Updated")
+
+    updatedActivity === 1 ? res.send("Success") : res.send("Error")
+
 }
 
 const GetTotalActivityCount = async (req, res) => {
