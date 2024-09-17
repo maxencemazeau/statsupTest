@@ -13,11 +13,22 @@ const searchFriendRoutes = require("./routes/SearchFriendRoutes");
 const profilRoutes = require('./routes/ProfilRoutes');
 const friendRoutes = require("./routes/FriendRoutes");
 const feedRoutes = require("./routes/FeedRoutes")
+const authenticateToken = require('./middleware/AuthenticateToken');
 
 fastify.register(cors, {
   origin: '*',
   methods: ['GET', 'PUT', 'POST', 'DELETE'], // Allow these methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+});
+
+// Register the middleware globally for routes that require it
+fastify.addHook('preHandler', (request, reply, done) => {
+  if (request.routeOptions.url !== '/userLogin' && request.routeOptions.url !== '/userSignUp') {
+    // Skip token authentication for public routes
+    authenticateToken(request, reply, done);
+  } else {
+    done();
+  }
 });
 
 fastify.register(require('@fastify/multipart'), {

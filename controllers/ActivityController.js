@@ -66,7 +66,7 @@ const userActivity = async (req, res) => {
 const addActivity = async (req, res) => {
   let addActivity = false;
   let newGoalId = 0;
-  const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId } = req.body.params;
+  const { ActivityName, GoalsId, CreateNewGoal, GoalName, TimeFrame, Frequence, UserId } = req.body;
   if (CreateNewGoal !== true) {
     if (GoalsId == 0) {
       GoalsId = null
@@ -108,7 +108,7 @@ const CheckDuplicate = async (req, res) => {
 };
 
 const DeleteActivity = async (req, res) => {
-  const ActivityID = req.query.id;
+  const { ActivityID } = req.body;
   const hasBeenDeleted = await activityServices.DeleteActivity(ActivityID)
 
   if (hasBeenDeleted > 0) {

@@ -16,7 +16,7 @@ const GetUserSearch = async (req, res) => {
 }
 
 const FollowUser = async (req, res) => {
-    const { FollowingId, FollowerId } = req.body.params
+    const { FollowingId, FollowerId } = req.body
     const hasBeenFollow = await searchFriendServices.FollowUser(FollowingId, FollowerId)
 
     if (hasBeenFollow) {
@@ -27,7 +27,7 @@ const FollowUser = async (req, res) => {
 }
 
 const UnFollowUser = async (req, res) => {
-    const { FollowingId, FollowerId } = req.query
+    const { FollowingId, FollowerId } = req.body
     const hasBeenUnFollow = await searchFriendServices.UnFollowUser(FollowingId, FollowerId)
 
     if (hasBeenUnFollow) {

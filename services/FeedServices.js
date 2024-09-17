@@ -23,7 +23,7 @@ INNER JOIN TimeFrame ON Goals.TimeFrameID = TimeFrame.TimeFrameID
 WHERE Follow.FollowerID = ?
 ORDER BY TimeStamp DESC
 LIMIT 100`, [UserID])
-
+        console.log(query[0])
         return query[0]
     } catch (err) {
         console.log(err)

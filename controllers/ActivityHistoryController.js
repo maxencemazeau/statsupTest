@@ -4,7 +4,7 @@ const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
 
 const addActivityHistory = async (req, res) => {
-    const { ActivityID, TimeStamp, Count, Frequence, UserID, HoursSpent } = req.body.params
+    const { ActivityID, TimeStamp, Count, Frequence, UserID, HoursSpent } = req.body
     let addHistory = 0
     const today = FormattedDate('fullDate')
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
@@ -36,7 +36,7 @@ const addActivityHistory = async (req, res) => {
 }
 
 const DeleteActivityHistory = async (req, res) => {
-    const { ActivityID, TimeStamp, Count } = req.query
+    const { ActivityID, TimeStamp, Count } = req.body
     const today = FormattedDate('fullDate')
 
     let deleteHistory = 0
@@ -61,10 +61,10 @@ const DeleteActivityHistory = async (req, res) => {
 }
 
 const UpdateActivityHistory = async (req, res) => {
-    const { ActivityID, HoursSpent } = req.body.params
+    const { ActivityID, HoursSpent } = req.body
     const getLastActivityHistory = await activityHistortyServices.GetLastActivityHistory(ActivityID)
     const newHoursSpent = getLastActivityHistory.HoursSpent + HoursSpent
-    const updatedActivity = activityHistortyServices.UpdateActivityHistory(newHoursSpent, getLastActivityHistory.ActivityHistoryID)
+    const updatedActivity = await activityHistortyServices.UpdateActivityHistory(newHoursSpent, getLastActivityHistory.ActivityHistoryID)
 
     updatedActivity === 1 ? res.send("Success") : res.send("Error")
 

@@ -4,7 +4,6 @@ const { historyFormattedDate } = require("../utils/historyFormattedDate")
 const GetFeed = async (req, res) => {
     const { UserID } = req.query
     const feedResult = await feedServices.GetFeed(UserID)
-
     const modifiedResult = feedResult.map(article => {
         article.TimeStamp = historyFormattedDate(article.TimeStamp)
         switch (article.Succeed) {

@@ -53,7 +53,7 @@ const CheckDuplicate = async (req, res) => {
 };
 
 const DeleteGoal = async (req, res) => {
-    const GoalID = req.query.id;
+    const { GoalID } = req.body;
     const hasBeenDeleted = await goalServices.DeleteGoal(GoalID)
 
     if (hasBeenDeleted > 0) {
