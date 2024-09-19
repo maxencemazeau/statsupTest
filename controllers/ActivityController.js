@@ -148,8 +148,14 @@ const GetUserActivityByID = async (req, res) => {
 }
 
 const UpdateActivity = async (req, res) => {
-  const { ActivityID, ActivityName, GoalsId, UserId } = req.body.params
-  const hasActivitybeenUpdated = await activityServices.UpdateActivity(ActivityID, ActivityName, GoalsId)
+  const { ActivityID, ActivityName, GoalsId, UserId } = req.body
+  let hasActivitybeenUpdated
+  if (GoalsId === -1) {
+    hasActivitybeenUpdated = await activityServices.UpdateActivity(ActivityID, ActivityName, null)
+  } else {
+    hasActivitybeenUpdated = await activityServices.UpdateActivity(ActivityID, ActivityName, GoalsId)
+  }
+
   if (hasActivitybeenUpdated === 1) {
     res.send(1)
   } else {

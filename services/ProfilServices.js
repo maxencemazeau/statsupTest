@@ -40,7 +40,7 @@ const GetProfilInfoAndStats = async (UserId) => {
             (SELECT GoalName 
              FROM ActivityHistory
              INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-             INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+             INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
              WHERE Goals.UserID = ?
              GROUP BY GoalName 
              ORDER BY COUNT(Goals.GoalsID) DESC 

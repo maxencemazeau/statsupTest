@@ -1,5 +1,6 @@
 const goalServices = require('../services/GoalServices')
 const activityServices = require('../services/ActivityServices')
+const { convertFloatToHour } = require('../utils/convertFloatToTime')
 
 const userGoal = async (req, res) => {
     let noMoreData = false;
@@ -25,7 +26,7 @@ const userGoal = async (req, res) => {
 }
 
 const addGoal = async (req, res) => {
-    const { GoalName, TimeFrame, LinkActivity, Frequence, UserId } = req.body.params
+    const { GoalName, TimeFrame, LinkActivity, Frequence, UserId } = req.body
     let addGoal = 0
 
     addGoal = await goalServices.createNewGoal(GoalName, TimeFrame, Frequence, UserId)
@@ -70,15 +71,20 @@ const GetAllUserGoal = async (req, res) => {
 }
 
 const UpdateGoal = async (req, res) => {
-    const { GoalsId, GoalName, TimeFrameID, Frequence, LinkActivity } = req.body.params
+    const { GoalsId, GoalName, TimeFrameID, Frequence, LinkActivity } = req.body
     const hasGoalbeenUpdated = await goalServices.UpdateGoal(GoalName, TimeFrameID, Frequence, GoalsId)
-
-    if (LinkActivity.length > 0) {
-        for (i = 0; i < LinkActivity.length; i++) {
-            await activityServices.UpdateActivityFromGoal(GoalsId, LinkActivity[i])
+    let hasActivityBeenUpdated = 1
+    if (LinkActivity !== undefined && LinkActivity.length > 0) {
+        for (let activity of LinkActivity) {
+            if (activity.isChecked === true) {
+                hasActivityBeenUpdated = await activityServices.UpdateActivityFromGoal(GoalsId, activity.ActivityID)
+            } else {
+                hasActivityBeenUpdated = await activityServices.UpdateActivityFromGoal(null, activity.ActivityID)
+            }
         }
     }
-    if (hasGoalbeenUpdated === 1) {
+
+    if (hasGoalbeenUpdated === 1 && hasActivityBeenUpdated === 1) {
         res.send(1)
     } else {
         res.send(0)
@@ -120,12 +126,29 @@ const GetAllActivityStatsForGoal = async (req, res) => {
     let activitiesBestStreak = await GetAllActivityBestStreak(GoalID)
 
     activtiesStat = activtiesStat.map(activites => {
+        // Créer un nouvel objet avec toutes les propriétés existantes
+        let updatedActivity = { ...activites };
+
+        // Ajout du BestStreak
         const bestStreak = activitiesBestStreak.find((streak) => streak.ActivityID === activites.ActivityID);
         if (bestStreak !== undefined) {
-            return { ...activites, BestStreak: bestStreak.BestStreak };
+            updatedActivity.BestStreak = bestStreak.BestStreak;
         }
-        return activity;
-    })
+
+        // Conversion du totalTime en heures et minutes
+        if (updatedActivity.totalTime > 0) {
+            const { hours, minutes } = convertFloatToHour(updatedActivity.totalTime);
+            // Ajout explicite des nouvelles propriétés
+            updatedActivity.Hour = hours;
+            updatedActivity.minutes = minutes;
+        } else {
+            // Si totalTime n'est pas > 0, on ajoute quand même les propriétés avec des valeurs par défaut
+            updatedActivity.Hour = 0;
+            updatedActivity.minutes = 0;
+        }
+
+        return updatedActivity;
+    });
 
     res.send(activtiesStat)
 }

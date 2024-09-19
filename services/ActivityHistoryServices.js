@@ -1,10 +1,10 @@
 const db = require("../db");
 const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
-const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent) => {
+const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID) => {
     try {
-        const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent) values (?,?,?,?,?,?)`,
-            [ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent])
+        const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID) values (?,?,?,?,?,?,?)`,
+            [ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID])
         return query[0].affectedRows
     } catch (err) {
         console.log(err)
@@ -136,7 +136,7 @@ const GetActivityHistory = async (ActivityID, Limit, Offset) => {
         const [query] = await db.query(`SELECT ActivityHistoryID, Succeed, DATE_FORMAT(TimeStamp, '%Y-%m-%d') as TimeStamp, Count, ActivityHistory.ActivityID, Frequence 
             FROM ActivityHistory 
             INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-            INNER JOIN Goals ON Goals.GoalsID = Activity.GoalsID
+            INNER JOIN Goals ON Goals.GoalsID = ActivityHistory.GoalsID
             WHERE ActivityHistory.ActivityID = ?
             ORDER BY ActivityHistoryID DESC
             LIMIT ? OFFSET ?`, [ActivityID, Limit, Offset])

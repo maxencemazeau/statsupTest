@@ -12,6 +12,7 @@ const ActivityById = async (id, limit, offset) => {
     Activity.UserID, 
     Activity.Timer, 
     Goals.GoalName, 
+    Goals.GoalsID,
     DATE_FORMAT(ActivityHistory.TimeStamp, '%Y-%m-%d') as TimeStamp,
     ActivityHistory.ActivityHistoryID,
     ActivityHistory.Count
@@ -120,10 +121,18 @@ const UpdateActivity = async (ActivityId, ActivityName, GoalsId) => {
 }
 
 const UpdateActivityFromGoal = async (GoalsID, ActivityID) => {
+  console.log(GoalsID + " " + ActivityID)
   try {
     const query = await db.query(`UPDATE Activity set GoalsID = ? WHERE ActivityID = ?`, [GoalsID, ActivityID])
+    console.log(query[0])
+    if (query[0].affectedRows === 1) {
+      return 1
+    } else {
+      return 0
+    }
   } catch {
     console.log(err)
+    return 0
   }
 }
 

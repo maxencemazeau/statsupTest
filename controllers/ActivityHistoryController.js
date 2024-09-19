@@ -4,23 +4,23 @@ const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
 
 const addActivityHistory = async (req, res) => {
-    const { ActivityID, TimeStamp, Count, Frequence, UserID, HoursSpent } = req.body
+    const { ActivityID, TimeStamp, Count, Frequence, UserID, HoursSpent, GoalsID } = req.body
     let addHistory = 0
     const today = FormattedDate('fullDate')
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
     if (hasTodayHistory === 0) {
         if (Frequence === Count) {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent)
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent, GoalsID)
         } else {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent)
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent, GoalsID)
         }
     } else {
         const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
         if (lastHistoryFormattedDate !== today) {
             if (Count >= hasTodayHistory.Frequence) {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent, GoalsID)
             } else {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent, GoalsID)
             }
         }
     }

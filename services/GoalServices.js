@@ -40,7 +40,9 @@ const DeleteGoal = async (GoalId) => {
 
 const GetAllUserGoal = async (UserId) => {
     try {
-        const query = await db.query(`SELECT GoalsID, GoalName FROM Goals WHERE UserID = ?`, [UserId])
+        const query = await db.query(`SELECT GoalsID, GoalName, Frequence, Goals.TimeFrameID, Frame FROM Goals
+            LEFT JOIN TimeFrame ON Goals.TimeFrameID = TimeFrame.TimeFrameID
+            WHERE UserID = ?`, [UserId])
         return query[0]
     } catch (err) {
         console.log(err)
@@ -94,11 +96,12 @@ const ActivityGoalStatsByWeek = async (GoalID) => {
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
-            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
+            TIMESTAMPDIFF(WEEK, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber,
+            SUM(HoursSpent) as totalTime
             FROM 
             ActivityHistory
             INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-            INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+            INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
             WHERE 
             Goals.GoalsID = ?
             GROUP BY ActivityHistory.ActivityID
@@ -118,11 +121,12 @@ const ActivityGoalStatsByDay = async (GoalID) => {
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
-            TIMESTAMPDIFF(DAY, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
+            TIMESTAMPDIFF(DAY, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber,
+            SUM(HoursSpent) as totalTime
             FROM 
             ActivityHistory
             INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-            INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+            INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
             WHERE 
             Goals.GoalsID = ?
             GROUP BY ActivityHistory.ActivityID
@@ -143,11 +147,12 @@ const ActivityGoalStatsByMonth = async (GoalID) => {
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
-            TIMESTAMPDIFF(MONTH, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber
+            TIMESTAMPDIFF(MONTH, MIN(TimeStamp), CURRENT_DATE()) AS totalGoalNumber,
+            SUM(HoursSpent) as totalTime
             FROM 
             ActivityHistory
             INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-            INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+            INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
             WHERE 
             Goals.GoalsID = ?
             GROUP BY ActivityHistory.ActivityID
@@ -162,8 +167,8 @@ const ActivityGoalStatsByMonth = async (GoalID) => {
 const GetAllActivityBestStreak = async (GoalID) => {
     const query = await db.query(`SELECT Activity.ActivityID ,Succeed FROM ActivityHistory 
                     INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-                    INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
-                    WHERE Goals.GoalsID = ? AND ActivityHistory.UserID = 67 AND (Succeed = 1 OR Succeed = -1)
+                    INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
+                    WHERE Goals.GoalsID = ? AND (Succeed = 1 OR Succeed = -1)
                     ORDER BY ActivityID`, [GoalID])
     return query[0]
 }
