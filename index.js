@@ -18,7 +18,7 @@ const authenticateToken = require('./middleware/AuthenticateToken');
 fastify.register(cors, {
   origin: '*',
   methods: ['GET', 'PUT', 'POST', 'DELETE'], // Allow these methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'], // Allow these headers
 });
 
 // Register the middleware globally for routes that require it
