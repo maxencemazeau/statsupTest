@@ -41,9 +41,9 @@ const GetProfilInfoAndStats = async (UserId) => {
              FROM ActivityHistory
              INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
              INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
-             WHERE Goals.UserID = ?
+             WHERE ActivityHistory.UserID = ?
              GROUP BY GoalName 
-             ORDER BY COUNT(Goals.GoalsID) DESC 
+             ORDER BY COUNT(ActivityHistory.GoalsID) DESC 
              LIMIT 1) AS MostDoneGoal,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) AS TotalAchievedGoals,
             
@@ -74,7 +74,7 @@ const GetActivityProfilList = async (UserId) => {
     Activity
     LEFT JOIN 
     ActivityHistory ON Activity.ActivityID = ActivityHistory.ActivityID
-    LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID 
+    LEFT JOIN Goals ON Goals.GoalsID = ActivityHistory.GoalsID 
     LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
     WHERE 
     ActivityHistory.UserID = ?
@@ -87,7 +87,7 @@ const GetBestGoalStreak = async (UserId) => {
     try {
         const query = await db.query(`SELECT Activity.ActivityID ,Succeed FROM ActivityHistory 
                     INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-                    INNER JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+                    INNER JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
                     WHERE ActivityHistory.UserID = ? AND (Succeed = 1 OR Succeed = -1)
                     ORDER BY ActivityID`, [UserId])
         return query[0]

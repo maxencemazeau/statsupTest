@@ -21,7 +21,7 @@ const userLoginService = async (email, password) => {
 
         // If passwords match, generate token and return user with token
         if (passwordMatch) {
-            const token = jwt.sign({ id: user.UserID, email: user.Email }, JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ id: user.UserID, email: user.Email }, JWT_SECRET);
             user = query[0][0]
             return { user, token };
         } else {

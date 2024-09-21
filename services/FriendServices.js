@@ -1,7 +1,7 @@
 const db = require("../db")
 
 const GetFriendList = async (UserID) => {
-    const query = await db.query(`SELECT FirstName, LastName, UserID FROM Follow
+    const query = await db.query(`SELECT FirstName, LastName, UserID, Photo FROM Follow
         INNER JOIN User ON Follow.FollowingID = User.UserID
         WHERE Follow.FollowerID = ?
         `, [UserID])

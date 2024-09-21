@@ -27,7 +27,7 @@ const CheckDuplicateHistory = async (ActivityID, TimeStamp, today) => {
         const [query] = await db.query(`SELECT ActivityHistoryID, ActivityHistory.ActivityID,TimeStamp, Goals.Frequence 
             FROM ActivityHistory 
             LEFT JOIN Activity ON Activity.ActivityId = ActivityHistory.ActivityID
-            LEFT JOIN Goals ON Activity.GoalsID = Goals.GoalsID
+            LEFT JOIN Goals ON ActivityHistory.GoalsID = Goals.GoalsID
             WHERE ActivityHistory.ActivityID = ? ORDER BY ActivityHistoryID DESC LIMIT 1`, [ActivityID])
         if (query.length > 0) {
             return query[0]
@@ -49,7 +49,7 @@ const CountActivityById = async (ActivityId) => {
 const ActivityStatsByWeek = async (ActivityId) => {
     try {
         const [query] = await db.query(`SELECT 
-            COUNT(ActivityID) AS totalActivityCompleted,
+            COUNT(ActivityID) as totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
@@ -69,7 +69,7 @@ const ActivityStatsByWeek = async (ActivityId) => {
 const ActivityStatsByDay = async (ActivityId) => {
     try {
         const [query] = await db.query(`SELECT 
-            COUNT(ActivityID) AS totalActivityCompleted,
+            COUNT(ActivityID) as totalActivityCompleted,
             COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
@@ -90,8 +90,8 @@ const ActivityStatsByDay = async (ActivityId) => {
 const ActivityStatsByMonth = async (ActivityId) => {
     try {
         const [query] = await db.query(`SELECT 
-            COUNT(ActivityID) AS totalActivityCompleted,
-            (COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            COUNT(ActivityID) as totalActivityCompleted,
+            COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,

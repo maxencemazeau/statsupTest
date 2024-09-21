@@ -57,8 +57,8 @@ const CheckDuplicate = async (req, res) => {
 const DeleteGoal = async (req, res) => {
     const { GoalID } = req.body;
     const hasBeenDeleted = await goalServices.DeleteGoal(GoalID)
-
-    if (hasBeenDeleted > 0) {
+    const hasActivityBeenUpdated = await goalServices.DeleteGoalFromActivity(GoalID)
+    if (hasBeenDeleted > 0 && hasActivityBeenUpdated === 1) {
         res.send("SUCCESS")
     } else {
         res.send("ERROR")

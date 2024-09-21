@@ -17,7 +17,7 @@ const ActivityById = async (id, limit, offset) => {
     ActivityHistory.ActivityHistoryID,
     ActivityHistory.Count
     FROM Activity
-    LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
+    LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID AND Goals.Actif = 0
     LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
     LEFT JOIN (
         SELECT ActivityID, MAX(ActivityHistoryID) as MaxActivityHistoryID
@@ -42,7 +42,7 @@ const ActivityWithoutGoal = async (id) => {
     const query = await db.query(
       `SELECT ActivityID, ActivityName, 
       false as checked
-      FROM Activity WHERE UserID = ? AND GoalsID = 0 OR GoalsID IS NULL`,
+      FROM Activity WHERE UserID = ? OR GoalsID IS NULL`,
       [id]
     );
     return query[0];
@@ -97,7 +97,7 @@ const GetUserActivityByID = async (ActivityId) => {
     const query = await db.query(`SELECT ActivityID, ActivityName, Frequence, Frame, Activity.UserID, 
       Goals.GoalsID, Goals.GoalName, TimeFrame.TimeFrameID, TimeFrame.Frame
       FROM Activity
-      LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID
+      LEFT JOIN Goals ON Goals.GoalsID = Activity.GoalsID AND Goals.Actif = 0
       LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
       WHERE Activity.ActivityID = ?`, [ActivityId])
     return query[0]

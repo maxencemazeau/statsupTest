@@ -6,7 +6,7 @@ const userGoal = async (id, limitValue, offsetValue) => {
         const query = await db.query(`SELECT GoalsID, GoalName, Frequence, Frame, Goals.UserID
     FROM Goals
     LEFT JOIN TimeFrame ON TimeFrame.TimeFrameID = Goals.TimeFrameID
-    WHERE UserID = ? ORDER BY GoalsID DESC LIMIT ? OFFSET ?`, [id, limitValue, offsetValue])
+    WHERE UserID = ? AND Actif = 0 ORDER BY GoalsID DESC LIMIT ? OFFSET ?`, [id, limitValue, offsetValue])
         return query[0]
     } catch (err) {
         console.log(err)
@@ -14,7 +14,7 @@ const userGoal = async (id, limitValue, offsetValue) => {
 };
 
 const rowsAfterOffset = async (id) => {
-    const query = await db.query(`SELECT Count(GoalsID) as lastAvailableRows FROM Goals WHERE UserID = ?`, [id])
+    const query = await db.query(`SELECT Count(GoalsID) as lastAvailableRows FROM Goals WHERE UserID = ? AND Actif = 0`, [id])
     return query[0]
 }
 
@@ -27,22 +27,26 @@ const createNewGoal = async (GoalName, TimeFrame, Frequence, UserId) => {
 
 const CheckNameDuplicate = async (UserId, GoalName) => {
     const query = await db.query(
-        `SELECT GoalName FROM Goals WHERE UserID = ? AND GoalName = ?`,
+        `SELECT GoalName FROM Goals WHERE UserID = ? AND GoalName = ? AND Actif = 0`,
         [UserId, GoalName]
     );
     return query[0];
 };
 
 const DeleteGoal = async (GoalId) => {
-    const query = await db.query(`DELETE FROM Goals WHERE GoalsID = ?`, [GoalId])
-    return query[0].affectedRows;
+    const query = await db.query(`UPDATE Goals set Actif = 1 WHERE GoalsID = ?`, [GoalId])
+    if (query[0].affectedRows > 0) {
+        return 1
+    } else {
+        return 0
+    }
 }
 
 const GetAllUserGoal = async (UserId) => {
     try {
         const query = await db.query(`SELECT GoalsID, GoalName, Frequence, Goals.TimeFrameID, Frame FROM Goals
             LEFT JOIN TimeFrame ON Goals.TimeFrameID = TimeFrame.TimeFrameID
-            WHERE UserID = ?`, [UserId])
+            WHERE UserID = ? AND Actif = 0`, [UserId])
         return query[0]
     } catch (err) {
         console.log(err)
@@ -65,7 +69,7 @@ const UpdateGoal = async (GoalName, TimeFrameID, Frequence, GoalsID) => {
 const GetUserGoalByID = async (GoalsID) => {
     const query = await db.query(`SELECT GoalName, Goals.TimeFrameID, Frequence FROM Goals 
         INNER JOIN TimeFrame ON Goals.TimeFrameID = TimeFrame.TimeFrameID
-        WHERE GoalsID = ?`, [GoalsID])
+        WHERE GoalsID = ? AND Actif = 0`, [GoalsID])
     return query[0]
 }
 
@@ -82,7 +86,7 @@ const GetLinkedActivityToGoal = async (GoalsID) => {
     LEFT JOIN 
     Goals ON Activity.GoalsID = Goals.GoalsID
     WHERE 
-    Goals.GoalsID = ? OR Activity.GoalsID IS NULL`, [GoalsID])
+    Goals.GoalsID = ? OR Activity.GoalsID IS NULL AND Actif = 0`, [GoalsID])
     return query[0]
 }
 
@@ -173,7 +177,16 @@ const GetAllActivityBestStreak = async (GoalID) => {
     return query[0]
 }
 
+const DeleteGoalFromActivity = async (GoalID) => {
+    try {
+        const query = await db.query(`UPDATE Activity set GoalsID = null WHERE GoalsID = ?`, [GoalID])
+        return 1
+    } catch (err) {
+        return 0
+    }
+}
+
 module.exports = {
     userGoal, rowsAfterOffset, createNewGoal, CheckNameDuplicate, DeleteGoal, GetAllUserGoal, UpdateGoal, GetUserGoalByID, GetLinkedActivityToGoal,
-    ActivityGoalStatsByWeek, ActivityGoalStatsByMonth, ActivityGoalStatsByDay, GetAllActivityBestStreak
+    ActivityGoalStatsByWeek, ActivityGoalStatsByMonth, ActivityGoalStatsByDay, GetAllActivityBestStreak, DeleteGoalFromActivity
 }
