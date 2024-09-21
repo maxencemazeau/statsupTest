@@ -2,7 +2,7 @@ const userServices = require('../services/UserServices');
 const { ConvertPhotoToUri } = require("../utils/convertPhotoToUri");
 
 const userLogin = async (req, res) => {
-    let { email, password } = req.body;
+    let { email, password } = req.query;
     try {
         email = email.trim().toLowerCase()
         password = password.trim()
