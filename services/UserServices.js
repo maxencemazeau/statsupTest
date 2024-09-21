@@ -10,7 +10,7 @@ const userLoginService = async (email, password) => {
         // Query user from the database
         console.log('Querying database for user:', email);
         const query = await db.query('SELECT UserID ,Email, Password, Photo FROM User WHERE email = ?', [email]);
-        console.log('Query result:', rows);
+        console.log('Query result:', query[0]);
         let user = query[0];
 
         // If user not found, return null
@@ -32,7 +32,7 @@ const userLoginService = async (email, password) => {
             return null; // Incorrect password case
         }
     } catch (error) {
-        console.log(error.response.data)
+        console.log(error)
         throw error; // Propagate any database or bcrypt errors
     }
 };
