@@ -10,17 +10,17 @@ const addActivityHistory = async (req, res) => {
     const hasTodayHistory = await activityHistortyServices.CheckDuplicateHistory(ActivityID, TimeStamp, today)
     if (hasTodayHistory === 0) {
         if (Frequence === Count) {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent, GoalsID)
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent, GoalsID, Frequence)
         } else {
-            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent, GoalsID)
+            addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent, GoalsID, Frequence)
         }
     } else {
         const lastHistoryFormattedDate = historyFormattedDate(hasTodayHistory.TimeStamp)
         if (lastHistoryFormattedDate !== today) {
             if (Count >= hasTodayHistory.Frequence) {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent, GoalsID)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 1, UserID, HoursSpent, GoalsID, Frequence)
             } else {
-                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent, GoalsID)
+                addHistory = await activityHistortyServices.AddActivityHistory(ActivityID, TimeStamp, Count, 0, UserID, HoursSpent, GoalsID, Frequence)
             }
         }
     }

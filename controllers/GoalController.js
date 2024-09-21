@@ -13,6 +13,7 @@ const userGoal = async (req, res) => {
         limit = lastAvailableRow
         noMoreData = true
     }
+
     if (lastAvailableRow > 0) {
         const offsetValue = parseInt(offset);
         const limitValue = parseInt(limit)
@@ -32,7 +33,7 @@ const addGoal = async (req, res) => {
     addGoal = await goalServices.createNewGoal(GoalName, TimeFrame, Frequence, UserId)
     if (LinkActivity.length > 0) {
         for (i = 0; i < LinkActivity.length; i++) {
-            const linkActivityToGoal = await activityServices.LinkActivityToGoal(addGoal, LinkActivity[i])
+            const linkActivityToGoal = await activityServices.LinkActivityToGoal(addGoal, LinkActivity[i].ActivityID)
         }
     }
     if (addGoal > 0) {

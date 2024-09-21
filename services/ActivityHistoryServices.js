@@ -1,10 +1,10 @@
 const db = require("../db");
 const { historyFormattedDate } = require('../utils/historyFormattedDate')
 
-const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID) => {
+const AddActivityHistory = async (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID, Frequence) => {
     try {
-        const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID) values (?,?,?,?,?,?,?)`,
-            [ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID])
+        const query = await db.query(`INSERT INTO ActivityHistory (ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID, Frequence) values (?,?,?,?,?,?,?,?)`,
+            [ActivityID, TimeStamp, Count, Succeed, UserID, HoursSpent, GoalsID, Frequence])
         return query[0].affectedRows
     } catch (err) {
         console.log(err)
@@ -91,7 +91,7 @@ const ActivityStatsByMonth = async (ActivityId) => {
     try {
         const [query] = await db.query(`SELECT 
             COUNT(ActivityID) AS totalActivityCompleted,
-            COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
+            (COUNT(CASE WHEN Succeed = 1 THEN 1 END) as activityNbSucceed,
             SUM(HoursSpent) as totalTime,
             MIN(TimeStamp) AS date_premier,
             CURRENT_DATE() AS date_dernier,
@@ -133,10 +133,10 @@ const GetBestActivityStreak = async (ActivityID, UserID) => {
 
 const GetActivityHistory = async (ActivityID, Limit, Offset) => {
     try {
-        const [query] = await db.query(`SELECT ActivityHistoryID, Succeed, DATE_FORMAT(TimeStamp, '%Y-%m-%d') as TimeStamp, Count, ActivityHistory.ActivityID, Frequence 
+        const [query] = await db.query(`SELECT ActivityHistoryID, Succeed, DATE_FORMAT(TimeStamp, '%Y-%m-%d') as TimeStamp, Count, ActivityHistory.ActivityID, ActivityHistory.Frequence 
             FROM ActivityHistory 
             INNER JOIN Activity ON ActivityHistory.ActivityID = Activity.ActivityID
-            INNER JOIN Goals ON Goals.GoalsID = ActivityHistory.GoalsID
+            LEFT JOIN Goals ON Goals.GoalsID = ActivityHistory.GoalsID
             WHERE ActivityHistory.ActivityID = ?
             ORDER BY ActivityHistoryID DESC
             LIMIT ? OFFSET ?`, [ActivityID, Limit, Offset])
