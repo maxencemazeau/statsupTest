@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const fastify = require('fastify')();
 const cors = require('@fastify/cors');
 const db = require("./db")
