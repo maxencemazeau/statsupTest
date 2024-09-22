@@ -15,7 +15,7 @@ const feedRoutes = require("./routes/FeedRoutes")
 const authenticateToken = require('./middleware/AuthenticateToken');
 
 fastify.register(cors, {
-  origin: '*',
+  origin: 'https://statsuptest-production.up.railway.app/',
   methods: ['GET', 'PUT', 'POST', 'DELETE'], // Allow these methods
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Postman-Token'], // Allow these headers
 });
